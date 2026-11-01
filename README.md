@@ -29,4 +29,4 @@ Supabase Realtime의 Broadcast와 Presence만 써서 테이블은 필요 없어�
 
 ---
 
-만든 사람 · 김지윤 (Qoo) · [@zziyoonii](https://www.instagram.com/zziyoonii/)
+만든 사람 · 김지윤 (Qoo) · [@qooqoo.haseyo](https://www.instagram.com/qooqoo.haseyo/)
