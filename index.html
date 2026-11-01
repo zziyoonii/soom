@@ -545,7 +545,7 @@ class Yogi {
     if (!lay) this.laid = false;
     this.matS = (this.matS || 0) + ((this.laid ? 1 : 0) - (this.matS || 0)) * Math.min(1, dt*5);
     const L = this.m.laid;
-    L.visible = this.matS > .03; this.m.roll.visible = this.matS < .5;
+    L.visible = this.matS > .03; this.m.roll.visible = !posing && this.matS < .5; // 샬라 매트 위에서 수련할 땐 등의 매트를 내려놔요
     if (L.visible && this.matAt) { const h = this.heading; L.rotation.y = h; L.scale.z = Math.max(.02, this.matS); L.position.set(this.matAt.x - Math.sin(h)*.3, groundY(this.matAt.x, this.matAt.z) + .016, this.matAt.z - Math.cos(h)*.3); }
     const P = POSES[active] || POSES.stand, c = this.cur, k = Math.min(1, dt*(active === 'savasana' || active === 'downdog' || active==='child' ? 3 : 6));
     if (c.ls === undefined) c.ls = 1;
