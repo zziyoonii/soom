@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>숨, 같이 쉬어가는 요가원</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --glass: rgba(28,26,34,.42);
+    --glass-strong: rgba(28,26,34,.62);
+    --line: rgba(255,240,225,.28);
+    --ink: #fff7ef;
+    --ink-soft: rgba(255,247,239,.72);
+    --accent: #f2b48a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden;background:#2a2230;font-family:'Noto Sans KR',system-ui,sans-serif;color:var(--ink);-webkit-user-select:none;user-select:none}
+  canvas{display:block;touch-action:none}
+  button{font-family:inherit;color:inherit;cursor:pointer;border:0;background:none}
+  .pill{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:999px}
+
+  /* top bar */
+  #top{position:fixed;top:16px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;z-index:5}
+  #top > *{pointer-events:auto}
+  #brand{display:flex;align-items:center;gap:14px;padding:10px 18px 10px 14px}
+  #brand .logo{font-family:'Gowun Batang',serif;font-weight:700;font-size:19px;letter-spacing:.04em}
+  #brand .room{font-size:13px;color:var(--ink-soft)}
+  #brand .count{font-size:13px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.1)}
+  #brand .count:hover{background:rgba(255,255,255,.18)}
+  #rightTools{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+  #tools{display:flex;gap:4px;padding:6px}
+  #tools button{width:36px;height:36px;border-radius:50%;display:grid;place-items:center}
+  #tools button:hover{background:rgba(255,255,255,.12)}
+  #classChip{padding:10px 14px;display:flex;align-items:center;gap:12px;font-size:13px}
+  #classChip .t{color:var(--ink-soft)}
+  #classChip b{font-weight:500;color:var(--ink)}
+  #classChip button{background:var(--accent);color:#3a2418;font-weight:700;font-size:12px;padding:6px 12px;border-radius:999px}
+  #classChip button:disabled{opacity:.5;cursor:default}
+
+  /* hint */
+  #hint{position:fixed;top:84px;left:50%;transform:translateX(-50%);font-size:13px;color:var(--ink-soft);text-shadow:0 1px 6px rgba(0,0,0,.5);transition:opacity 1.2s;z-index:4;white-space:nowrap}
+
+  /* action bar */
+  #actions{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);display:flex;gap:6px;padding:8px 10px;z-index:5;border-radius:28px}
+  #actions > div{position:relative}
+  #actions button.act{width:84px;padding:8px 0 6px;border-radius:20px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12.5px}
+  #actions button.act:hover{background:rgba(255,255,255,.1)}
+  #actions button.act.on{background:rgba(242,180,138,.28)}
+  #actions button.act svg{width:24px;height:24px}
+  #asanaMenu{position:absolute;bottom:calc(100% + 14px);left:50%;transform:translateX(-50%);padding:8px;border-radius:18px;display:none;flex-direction:column;gap:2px;min-width:170px;background:var(--glass-strong)}
+  #asanaMenu.open{display:flex}
+  #asanaMenu button{text-align:left;padding:9px 12px;border-radius:12px;font-size:13.5px;display:flex;justify-content:space-between;gap:10px}
+  #asanaMenu button span{color:var(--ink-soft);font-size:12px}
+  #asanaMenu button:hover{background:rgba(255,255,255,.1)}
+  #asanaMenu button.stop{color:var(--accent)}
+
+  /* breathing */
+  #breath{position:fixed;left:50%;top:44%;transform:translate(-50%,-50%);width:180px;height:180px;display:none;place-items:center;pointer-events:none;z-index:3}
+  #breath.show{display:grid}
+  #breath .ring{position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(255,236,220,.75);background:radial-gradient(circle,rgba(46,32,44,.42) 0%,rgba(46,32,44,.22) 55%,rgba(255,214,186,.12) 100%);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);transform:scale(.55);transition:transform 4s cubic-bezier(.45,0,.55,1)}
+  #breath .txt{position:relative;text-align:center;text-shadow:0 1px 10px rgba(0,0,0,.65)}
+  #breath .en{font-family:'Gowun Batang',serif;font-size:24px;letter-spacing:.08em;display:block}
+  #breath .ko{font-size:12px;color:var(--ink-soft);display:block;margin-top:2px}
+  #breath .n{font-size:13px;color:var(--ink-soft);display:block;margin-top:8px;font-variant-numeric:tabular-nums}
+
+  /* class caption */
+  #caption{position:fixed;top:104px;left:50%;transform:translateX(-50%);padding:10px 20px;font-size:14px;display:none;z-index:4;text-align:center}
+  #caption.show{display:block}
+  #caption small{display:block;color:var(--ink-soft);font-size:11.5px;margin-bottom:2px}
+  #caption b{font-family:'Gowun Batang',serif;font-size:17px;font-weight:700}
+
+  /* labels */
+  #labels{position:fixed;inset:0;pointer-events:none;z-index:2}
+  .lbl{position:absolute;transform:translate(-50%,-100%);font-size:12px;padding:3px 10px;border-radius:999px;background:rgba(255,250,244,.88);color:#3b2f2a;white-space:nowrap;opacity:0;transition:opacity .4s}
+  .lbl.me{background:var(--accent);color:#3a2418;font-weight:700}
+  .lbl.show{opacity:1}
+  .bub{position:absolute;transform:translate(-50%,-100%);font-size:22px;opacity:0;transition:opacity .3s, margin .9s;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3))}
+  .bub.show{opacity:1;margin-top:-14px}
+
+  /* panels */
+  .panel{position:fixed;top:76px;left:16px;width:260px;max-height:60vh;overflow:auto;padding:16px;border-radius:20px;background:var(--glass-strong);border:1px solid var(--line);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);display:none;z-index:6}
+  .panel.open{display:block}
+  .panel h3{font-family:'Gowun Batang',serif;font-size:16px;margin-bottom:10px;display:flex;justify-content:space-between}
+  .panel h3 button{font-size:18px;line-height:1;opacity:.7}
+  .panel li{list-style:none;font-size:13.5px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between}
+  .panel li span{color:var(--ink-soft);font-size:12px}
+  .panel.right{left:auto;right:16px;width:290px;max-height:calc(100vh - 110px)}
+  .fee-menu{margin:4px 0 12px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.07)}
+  .fee-menu div{display:flex;justify-content:space-between;font-size:13px;padding:4px 0}
+  .fee-menu div span:last-child{color:var(--accent);font-variant-numeric:tabular-nums}
+  .fee-menu div.free span:last-child{color:#b9d6a8}
+  .qr{display:block;width:150px;height:150px;margin:6px auto 12px;border-radius:12px;background:#fff;padding:8px}
+  .fee-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:11px 14px;border-radius:14px;font-size:13.5px;margin-bottom:8px;background:rgba(255,255,255,.1);text-decoration:none;color:var(--ink)}
+  .fee-btn:hover{background:rgba(255,255,255,.17)}
+  .fee-btn.primary{background:var(--accent);color:#3a2418;font-weight:700}
+  .fee-btn small{font-size:12px;opacity:.75;font-weight:400}
+  .maker{margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.1);font-size:12px;color:var(--ink-soft);display:flex;justify-content:space-between}
+  .maker a{color:var(--ink);text-decoration:none}
+  .maker a:hover{text-decoration:underline}
+  #toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);padding:9px 16px;font-size:13px;opacity:0;transition:opacity .3s;z-index:9;pointer-events:none}
+  #toast.show{opacity:1}
+  .panel p{font-size:12px;color:var(--ink-soft);margin-top:10px;line-height:1.6}
+
+  #proto{position:fixed;right:16px;bottom:16px;font-size:11px;color:var(--ink-soft);z-index:4;text-shadow:0 1px 4px rgba(0,0,0,.5)}
+
+  /* loader */
+  #loader{position:fixed;inset:0;background:#241e2a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:20;transition:opacity 1.2s}
+  #loader .mark{font-size:30px;opacity:.85}
+  #loader h1{font-family:'Gowun Batang',serif;font-size:30px;letter-spacing:.2em;margin-left:.2em}
+  #loader p{font-size:13px;color:var(--ink-soft)}
+  #loader .dot{width:6px;height:6px;border-radius:50%;background:var(--ink-soft);margin-top:16px;animation:pulse 1.6s ease-in-out infinite}
+  @keyframes pulse{0%,100%{transform:scale(.6);opacity:.4}50%{transform:scale(1.4);opacity:1}}
+
+  @media (max-width:640px){
+    #brand .room{display:none}
+    #classChip .t{display:none}
+    #hint{font-size:11.5px;top:74px}
+    #actions button.act{width:72px}
+    #proto{display:none}
+  }
+</style>
+</head>
+<body>
+<div id="loader"><div class="mark">🪷</div><h1>숨</h1><p>요가원을 여는 중</p><div class="dot"></div></div>
+
+<div id="top">
+  <div id="brand" class="pill">
+    <span class="logo">숨</span>
+    <span class="room" id="roomLbl">노을 샬라</span>
+    <button class="count" id="countBtn" aria-label="함께 있는 사람 보기">9/100</button>
+  </div>
+  <div id="rightTools">
+    <div id="tools" class="pill">
+      <button id="soundBtn" aria-label="소리 켜기" title="소리 켜기">
+        <svg id="soundIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="m22 9-6 6M16 9l6 6"/></svg>
+      </button>
+      <button id="feeBtn" aria-label="매트 이용료 내기" title="매트 이용료 내기" style="font-size:17px">🧘</button>
+      <button id="namesBtn" aria-label="이름 보기" title="이름 보기">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3.2 3-5 5.5-5s4.7 1.8 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M16 14.2c2.3.1 3.9 1.6 4.5 4.3"/></svg>
+      </button>
+    </div>
+    <div id="classChip" class="pill"><span class="t">다음 함께 수련 · <b id="nextClass">22:00 요가 니드라</b></span><button id="classBtn">미리 해보기</button></div>
+  </div>
+</div>
+
+<div id="hint">바닥 클릭 · WASD로 걷기 · 드래그로 둘러보기 · 휠로 확대/축소</div>
+<div id="caption" class="pill"><small>함께 수련 중</small><b id="capText">호흡</b></div>
+<div id="breath"><div class="ring" id="ring"></div><div class="txt"><span class="en" id="breathEn">Inhale</span><span class="ko" id="breathKo">들이쉬기</span><span class="n" id="breathN">4</span></div></div>
+<div id="labels"></div>
+
+<div id="visitors" class="panel">
+  <h3>함께 있는 사람 <button id="closeVisitors" aria-label="닫기">×</button></h3>
+  <ul id="visitorList"></ul>
+  <p>사람을 누르면 이름이 잠깐 보여요.<br>나마스테로 근처 사람들에게 인사해요.</p>
+</div>
+
+<div id="fee" class="panel right">
+  <h3>매트 이용료 <button id="closeFee" aria-label="닫기">×</button></h3>
+  <p style="margin:0 0 10px;color:var(--ink)">오늘 매트 잘 쓰셨나요? 🙏<br><span style="color:var(--ink-soft)">이용료는 자율이에요. 안 내도 매트는 그대로 깔려 있어요.</span></p>
+  <div class="fee-menu">
+    <div><span>매트 1장 하루 대여</span><span>1,000원</span></div>
+    <div><span>요가 블록 추가</span><span>+500원</span></div>
+    <div><span>싱잉볼 한 번 더 울리기</span><span>+300원</span></div>
+    <div class="free"><span>사바아사나 (누워 쉬기)</span><span>무제한 무료</span></div>
+  </div>
+  <img class="qr" alt="토스 송금 QR 코드" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAIAAAAiOjnJAAAfbElEQVR42u1ddbAcVfO9+fDgENyCu0NwdwkQAgGSoEkI7lQCFA4FhVYIDiksuBM0UDjBAsHdgru7/s5v+3vn67e3987d2d0Yff6amje+86b7nnv6dId//vknOBzNxn/8ETj8xXL4i+XwF8vh8BfL4S+Ww18sh8NfLIe/WA5/sRwOf7Ec/mI5/MVyOJqGf7Ix+eSTN+WMe+yxB48522yzycrddtuNK+eee25ZudNOO8WXceWVV/JQr776arzB4osvHp/02WefjbdcYYUV4i0fe+yxxEN48MEHueV9990nKx999NH4OCuuuCL32myzzeINbr75ZvnrCy+8UOIxXnbZZfHl7brrrvLX2WefnSt33333pvxweAHy3xb/Yjk8FDrGH0xcYp/VVltt/fXXr3ev00477aeffqpaefDBB//www9YWG655bjywAMP/Pbbb7HQoUOHY489Vlbut99+008/PRaWXHLJo48+WlZee+218Ym23XbbbbbZBguvvfYaN8Ch4i0RI+IgNddcc8VbXnrppaNHj5bj8OwImhIEP/jgA27Zu3fv+eefv+ri33zzzfiYvCR9bbj4xRZbLOd5vvvuuzw+8dxzz/33g/Gf/30yuDzVVFPhgdf7w917770jRoyoOmZLcqxDDz30n/ox00wzye79+/fP3AU/J6/zrbfeijdYeOGF4zt68cUX5a833XRTOsfKxxprrCHHWXPNNbly3XXXjc9+9913y1+ffPLJ9JM3c6zrrrsu85J23HHHxMHNHGvmmWcuce98Fz3HcniO5fAXy8TUU0/doTb22WefRg6+884789O64YYbxse/5ZZb4o/w9ttvL3+9/PLLuRJ0Roc8SD5RF1ZddVWeaKONNoo3GDZsmPz1mWeeSR+qR48echmLLrpoekveHZKtEs927733TjyEaaaZxr9YDg+FDqcbEtDD4/QQVG9pjq7POOMMoRtMLLPMMltuuaUs77///l9//TUWXnrppRtvvDFBInDl66+/zgH5Z599lrjOBRZYoFevXgm6gcfU94tILaNFzSxouoFbXn311QyCZCuer6CKwtBn5DG7d+++xBJLYOGbb74566yzZGW3bt2WWmqpqhPhceGhYUHHMl6zyUHk/3BjlG4ANZIO5Gm6gVM6Jpo4pZMGEqMSdAOhp3TSdMOyyy7Lvfg/g5cmPuYrr7zCva666ipZqfkwTunoHGvIkCHxoUy6Ya+99kqnzk43ODzHcniONWbw8ccfxyvnmWee999/v2olEpd33nkHCzvssAP9JhZZZBEkUiFi3iUjAbW99dZbhzbmHWEoRAKEkSNHxtzB448/XuuCH374YTOxi9GlS5e0Lwa4El5wfEzcWqatRufOncdBAw7/Yjn8xXL8e+iGww8//LfffkuEgzTdYILqBhk5V9ENehz+1VdfyQJGgqJoAG6sIFTUDdz9wgsvnHXWWbGAeWtQ86G9ugF0Q3yd8803X3qi94orrpDoDGUiFXY8FKL8RRddJMs9e/ZccMEFsfDpp59ecMEFVcf5/PPPQ6Ru0LdJyBNgJJXx4HTTTYeHk/p4WHQDbpzj9BiTTTbZWKYbWqpuMKHpBv17ZNINm2++efr4q6yyimy53nrrpbekukFP6RCabsif0qG6QdMNaSAlTV+nqxscnmM5HE1/sU499dQO9eOLL76Icyzo0eSvffr00d92WYk5E003yMrbb789LfQjttpqK26p0zVNN8gxN9544/Qtg3CXLddaa61QROJT2cGzn3/++bKyb9++aeYdoVC2BFGi9Rp8CGmhH0Ucc8wxR/xXJHMlfrjTTz/dv1gOD4UOpxsERxxxxJ9//tn4KXU1H4sp9Oj6+++/lwWIwblSJqRDpZiCuyPcfPnll1W7M+bq4TGKGT/55BOhG+JxeKEKA2yCjAFBc2eqBkA38JIQc+Wu9XViJkAC9CyzzBKU0E9GtZoL4DGhbuDuVMp/9913XIksQoQSWt3QtWvX9GR/JiaZZJKW0A0txcUXX5y+TrOYgjDLdXSOZYKvuFY3NEg3QOka8hSkLKYoBHOsQpjqhrECD4UOz7EcYUL0bjBBod8BBxzAlZhkSJwxX+iXD5N5N0Phbbfdxr2eeuqpBPMeShVTmMx7yBb6cWJK1A05dIPJvH/44Yc8KciOxC/IaTHgzDPPdObd4aHQ4XRDvaC6QUeQgQMH/vLLL6G2OILD4x9//FEW4N2AUbEsDxo0iOoGxovBgwfruX3SDTPOOGOoqBvSs/FQNwjdoCsXSE+//fbbQ4cO5QhRRnbQDqB2j3SDmCvBwYGF/2BA5p133lBRN8S3iYPHJRI69PM6wY/wgSAsxnQD4qOwJPrRISzK8c3EwyRQ4J0BB414Y17nyiuvzJU8EfTvssG4Tjecd955wZqLSPtjQcQS75UupjCndEx1w1133RUifyyYYXDlQw89lPDHKgf+zwRL3WDCLKYwYeZYEO3EZ4TVSrw7uLGgZvCcbnB4juXwFyvUVjew3BQj1czZcng4pekG5DGktrnX8OHD4+8tgp38FTMh6WseNWqU7AISPETqhk022STz3qFu4NlBzTN68jrvueeeep+nphvAm8QboH5EDi4y1NLA3FFcV4hpovg3mnbaabkXdJ2ycooppvAvlsNDocPphkwtwOqrrz7xxP9/5I8++ogDGRhMyngVw1eOrf744w9ZwICFK9dee+2YL0jbNEDjwN0xKpSxOuKsHsQJOnXqJFWHoaKziC0CGAVmmGEGXsl77733999/h8haQob6+tpQJKgrERIg5V1YpGBuYD4QVFkKq4IUhRevRX98ILqik1umkXlf5emGU045hbtD4iIrYe8RVDGJrAT5xJWw5UjQDRr4FZtuFRmyiynS3g0aaTvucjlWvroh346byKcbXN3g8BzL4TlWqFEm8Pvvv0sK9cADD4Q2vj+06QtojgCPqJ9//jlUCla5JcolZALH9GtA/eQhhxwS2qbrZQE1DtzdrA7AlIucCMz4McccE9pI/CmnnBILqPzk7gRyvnXWWSe0UdLpcow4y0FeBWKFy7IAUWt8otB+4kv8IBZaaCEWrB555JESQyeaaCJuedxxx8WHwgRDZuI1YMAATFfUyodAN/Dg8NmC0rDqOOecc84NN9wQanem0FMUY6FglbNXpj+WCT2lUwL5CtJC2UwJf6xC0E0+XzYTSrU8yQd5LJ1jpSuqXTbjGK9CIf5ZJRROOumkMTVgfqWrOAiQvBIK33jjjcTg+Yknnvj111+xALcF6N1kJXRzopjA95yOwvjkSCgE3cArefrpp6UFhhksQDdwS1YcYBgbd0rCv/LSSy9ddUcYBfPeSTeYwICfCnfEcTkpQiE3QACVuV49v46vl5SH4L5wd1XHBPe90korybJYUdQLXjx4Frmkjh07ciWOLyv/+uuvRx55JCf4tpxuKAyFzVI3iD9WFd2QryA1YaYOupgiTTeYML0b8mF6N2gFaQlouuHss89OKEi1usFDocPpBofnWDHdoJtdmRMLsFeQuRrNEcCMgDkWV8LICjMnob20krEcigZS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">
+  <a class="fee-btn primary" href="supertoss://send?bank=%ED%86%A0%EC%8A%A4%EB%B1%85%ED%81%AC&accountNo=100007262511">토스로 바로 보내기 <small>모바일</small></a>
+  <button class="fee-btn" id="copyAcct">토스뱅크 1000-0726-2511 <small>복사</small></button>
+  <p style="margin-top:2px">예금주 김지윤 · 이용료는 서버비와 새 공간 만드는 데 써요.</p>
+  <div class="maker"><span>만든 사람</span><a href="https://www.instagram.com/zziyoonii/" target="_blank" rel="noopener">김지윤 (Qoo) · @zziyoonii</a></div>
+</div>
+<div id="toast" class="pill"></div>
+
+<div id="actions" class="pill">
+  <div><button class="act" id="namasteBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-1.2 2.5-2.5 5-2.8 8.5L8 20h4V3z"/><path d="M12 3c1.2 2.5 2.5 5 2.8 8.5L16 20h-4"/></svg>나마스테</button></div>
+  <div><button class="act" id="asanaBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.5" r="2"/><path d="M12 7v7M12 9l-4-3M12 9l4-3M12 14l-3 6M12 14c1.5 0 3 .5 3.5 2"/></svg>아사나</button>
+    <div id="asanaMenu" class="pill">
+      <button data-pose="tree">나무 자세 <span>Vrksasana</span></button>
+      <button data-pose="downdog">아래를 보는 개 <span>Adho Mukha</span></button>
+      <button data-pose="child">아이 자세 <span>Balasana</span></button>
+      <button data-pose="savasana">누워 쉬기 <span>Savasana</span></button>
+      <button data-pose="stop" class="stop">일어나기</button>
+    </div>
+  </div>
+  <div><button class="act" id="breathBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="6.5" opacity=".6"/><circle cx="12" cy="12" r="10" opacity=".3"/></svg>호흡</button></div>
+</div>
+
+<div id="proto">데모 · 다른 방문객은 시뮬레이션이에요</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(() => {
+/* ===== 실시간 접속 설정 =====
+   Supabase 프로젝트의 Project URL과 anon(또는 publishable) 키를 넣으면 실제 방문객끼리 연결돼요.
+   비워두면 시뮬레이션 방문객이 돌아다니는 데모 모드로 열려요. */
+const SUPABASE_URL = '';
+const SUPABASE_KEY = '';
+
+const $ = id => document.getElementById(id);
+const esc = t => String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const params = new URLSearchParams(location.search);
+const ROOM = (params.get('room') || 'main').replace(/[^a-z0-9-]/gi,'').slice(0,24) || 'main';
+const LOCAL_TEST = params.has('localtest');
+const ONLINE = LOCAL_TEST || !!(SUPABASE_URL && SUPABASE_KEY);
+const rand = (a,b) => a + Math.random()*(b-a);
+const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+const clock = new THREE.Clock();
+const lin = c => new THREE.Color(c).convertSRGBToLinear();
+let now = 0;
+
+/* ---------- renderer / scene ---------- */
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.prepend(renderer.domElement);
+
+const scene = new THREE.Scene();
+const HORIZON = new THREE.Color('#f3a98a');
+scene.fog = new THREE.Fog(lin('#c98b8a'), 35, 110);
+const camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 400);
+
+// sky dome gradient
+(function sky(){
+  const c = document.createElement('canvas'); c.width = 4; c.height = 512;
+  const g = c.getContext('2d'); const gr = g.createLinearGradient(0,0,0,512);
+  gr.addColorStop(0,'#2b2547'); gr.addColorStop(.32,'#6a4f7a'); gr.addColorStop(.46,'#c9808a');
+  gr.addColorStop(.5,'#f6b28a'); gr.addColorStop(.53,'#f9cf9c'); gr.addColorStop(1,'#7d6b8c');
+  g.fillStyle = gr; g.fillRect(0,0,4,512);
+  const tex = new THREE.CanvasTexture(c); tex.encoding = THREE.sRGBEncoding;
+  const m = new THREE.Mesh(new THREE.SphereGeometry(200,32,16), new THREE.MeshBasicMaterial({map:tex, side:THREE.BackSide, fog:false}));
+  scene.add(m);
+  // sun disc
+  const sun = new THREE.Mesh(new THREE.CircleGeometry(9,48), new THREE.MeshBasicMaterial({color:'#ffd9a6', fog:false, transparent:true, opacity:.95}));
+  sun.position.set(0, 7, -170); scene.add(sun);
+  const glow = new THREE.Mesh(new THREE.CircleGeometry(26,48), new THREE.MeshBasicMaterial({color:'#ffb787', fog:false, transparent:true, opacity:.25}));
+  glow.position.set(0, 7, -171); scene.add(glow);
+})();
+
+scene.add(new THREE.HemisphereLight('#ffd8c2', '#4b4a5e', .75));
+const sunLight = new THREE.DirectionalLight('#ffc89e', 1.35);
+sunLight.position.set(6, 14, -24);
+sunLight.castShadow = true;
+sunLight.shadow.mapSize.set(2048,2048);
+Object.assign(sunLight.shadow.camera, {left:-26,right:26,top:26,bottom:-26,near:1,far:70});
+sunLight.shadow.bias = -0.0008;
+scene.add(sunLight);
+
+const mat = (color, o={}) => { const m = new THREE.MeshStandardMaterial(Object.assign({roughness:.85, metalness:0}, o)); m.color = lin(color); if (o.emissive) m.emissive = lin(o.emissive); return m; };
+function box(w,h,d,material,x,y,z){ const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material); m.position.set(x,y,z); m.castShadow=m.receiveShadow=true; scene.add(m); return m; }
+
+/* ---------- world ---------- */
+const walkables = [];
+// sea
+const sea = new THREE.Mesh(new THREE.CircleGeometry(220,64), mat('#6d7fa8',{roughness:.35, metalness:.1}));
+sea.rotation.x = -Math.PI/2; sea.position.y = -1.2; scene.add(sea);
+// island
+const ground = new THREE.Mesh(new THREE.CylinderGeometry(25,26.5,1.6,64), mat('#8a9a6b'));
+ground.position.y = -0.8; ground.receiveShadow = true; scene.add(ground);
+const grassTop = new THREE.Mesh(new THREE.CircleGeometry(25,64), mat('#94a775'));
+grassTop.rotation.x = -Math.PI/2; grassTop.position.y = 0.002; grassTop.receiveShadow = true; scene.add(grassTop);
+walkables.push(grassTop);
+const beach = new THREE.Mesh(new THREE.RingGeometry(22.5,25,64), mat('#e2c9a2'));
+beach.rotation.x = -Math.PI/2; beach.position.y = 0.006; beach.receiveShadow = true; scene.add(beach);
+
+// shala
+const SHALA = {x0:-6, x1:6, z0:-12.6, z1:-3.4, h:.3};
+const woodLight = mat('#c99a6b',{roughness:.7}), woodDark = mat('#6b4632'), woodMid = mat('#9a6a48');
+const platform = box(12,.3,9.2,woodLight,0,.15,-8); walkables.push(platform);
+box(3,.15,1.1,woodMid,0,.075,-2.85); // step
+for (const x of [-5.6,5.6]) for (const z of [-12.2,-9.4,-6.6,-3.8]) box(.28,3.4,.28,woodDark,x,2,z);
+box(12.8,.22,9.8,woodDark,0,3.8,-8);
+const roof = new THREE.Mesh(new THREE.ConeGeometry(9.2,1.8,4,1), mat('#5d3d2c'));
+roof.rotation.y = Math.PI/4; roof.scale.set(1,1,.78); roof.position.set(0,4.8,-8); roof.castShadow = true; scene.add(roof);
+// back wall with round moon window
+(function wall(){
+  const s = new THREE.Shape(); s.moveTo(-5.75,0); s.lineTo(5.75,0); s.lineTo(5.75,3.5); s.lineTo(-5.75,3.5); s.lineTo(-5.75,0);
+  const hole = new THREE.Path(); hole.absarc(0,1.9,1.35,0,Math.PI*2,true); s.holes.push(hole);
+  const g = new THREE.ExtrudeGeometry(s,{depth:.16, bevelEnabled:false});
+  const m = new THREE.Mesh(g, mat('#e9d8c0',{roughness:.95})); m.position.set(0,.3,-12.55); m.castShadow = m.receiveShadow = true; scene.add(m);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(1.35,.07,8,48), woodDark); ring.position.set(0,2.2,-12.38); scene.add(ring);
+})();
+// altar: low table, singing bowl, candles, plants
+box(2.6,.32,.7,woodDark,0,.46,-11.9);
+const bowl = new THREE.Mesh(new THREE.SphereGeometry(.22,24,12,0,Math.PI*2,Math.PI/2,Math.PI/2), mat('#b88a3e',{metalness:.7, roughness:.35, side:THREE.DoubleSide}));
+bowl.position.set(0,.84,-11.9); bowl.castShadow = true; scene.add(bowl);
+const flames = [];
+for (const x of [-1,-.6,.6,1]) {
+  box(.09,.2,.09,mat('#f4ead8'),x,.72,-11.9);
+  const f = new THREE.Mesh(new THREE.SphereGeometry(.035,8,8), new THREE.MeshBasicMaterial({color:'#ffcf7a'}));
+  f.position.set(x,.86,-11.9); f.scale.y = 1.7; scene.add(f); flames.push(f);
+}
+const altarLight = new THREE.PointLight('#ffb36b', 1.2, 7, 2); altarLight.position.set(0,1.3,-11.3); scene.add(altarLight);
+function plant(x,z,s=1,y=0){
+  const pot = new THREE.Mesh(new THREE.CylinderGeometry(.28*s,.22*s,.42*s,16), mat('#b8714f')); pot.position.set(x,y+.21*s,z); pot.castShadow = true; scene.add(pot);
+  for (let i=0;i<5;i++){ const l = new THREE.Mesh(new THREE.SphereGeometry(rand(.18,.28)*s,12,10), mat(pick(['#5f7f4c','#6d8f55','#4f6d40']))); l.position.set(x+rand(-.15,.15)*s,y+(.55+rand(0,.35))*s,z+rand(-.15,.15)*s); l.castShadow = true; scene.add(l); }
+}
+plant(-2.2,-12,1,.3); plant(2.2,-12,1,.3); plant(-5.2,-3.9,.9,.3); plant(5.2,-3.9,.9,.3);
+// paper lanterns
+for (const x of [-3,0,3]) {
+  const lan = new THREE.Mesh(new THREE.SphereGeometry(.32,16,12), mat('#ffe2b8',{emissive:'#ffb569', emissiveIntensity:1.1}));
+  lan.scale.y = 1.25; lan.position.set(x,3.05,-8); scene.add(lan);
+}
+const shalaLight = new THREE.PointLight('#ffc183', .9, 13, 2); shalaLight.position.set(0,2.7,-8); scene.add(shalaLight);
+
+// mats
+const MAT_COLORS = ['#9bb08f','#d3906e','#b4a6c9','#e0c79f','#8fa9b3','#cf9c9c'];
+const mats = [];
+for (const z of [-10.4,-7.9,-5.4]) for (const x of [-3.8,-1.27,1.27,3.8]) {
+  const m = box(1,.03,2,mat(pick(MAT_COLORS),{roughness:1}),x,.315,z); walkables.push(m);
+  mats.push({x, z, taken:null});
+}
+
+// stone path + lanterns
+for (let z=-1.6; z<15; z+=1.15) { const s = box(rand(1.1,1.4),.06,.85,mat('#b9b0a4'),rand(-.08,.08),.03,z); s.rotation.y = rand(-.1,.1); }
+for (const [x,z] of [[-1.4,1],[1.4,1],[-1.4,7.5],[1.4,7.5]]) {
+  box(.14,.8,.14,woodDark,x,.4,z);
+  const l = new THREE.Mesh(new THREE.BoxGeometry(.32,.38,.32), mat('#ffe6c0',{emissive:'#ffb064', emissiveIntensity:1})); l.position.set(x,.98,z); scene.add(l);
+}
+const pathLight = new THREE.PointLight('#ffb871', .7, 10, 2); pathLight.position.set(0,1.4,4); scene.add(pathLight);
+
+// sunset deck
+const DECK = {x0:9.5, x1:15.5, z0:-6, z1:-1, h:.18};
+const deck = box(6,.18,5,woodMid,12.5,.09,-3.5); walkables.push(deck);
+for (const [x,z,c] of [[11.2,-4.6,'#d3906e'],[13.6,-4.6,'#b4a6c9'],[12.4,-2.4,'#9bb08f']]) { const cu = new THREE.Mesh(new THREE.CylinderGeometry(.45,.48,.16,20), mat(c,{roughness:1})); cu.position.set(x,.26,z); cu.castShadow = cu.receiveShadow = true; scene.add(cu); }
+for (const x of [9.6,15.4]) for (const z of [-5.9,-1.1]) box(.12,.7,.12,woodDark,x,.5,z);
+
+// trees, bushes, rocks
+function tree(x,z){
+  const s = rand(.8,1.3);
+  const t = new THREE.Mesh(new THREE.CylinderGeometry(.12*s,.18*s,1.8*s,8), woodDark); t.position.set(x,.9*s,z); t.castShadow = true; scene.add(t);
+  const col = pick(['#5c7a4a','#6b8a52','#4e6a43','#7b8f55']);
+  for (let i=0;i<4;i++){ const c = new THREE.Mesh(new THREE.IcosahedronGeometry(rand(.6,.95)*s,1), mat(col,{flatShading:true})); c.position.set(x+rand(-.5,.5)*s, (1.9+rand(0,.9))*s, z+rand(-.5,.5)*s); c.castShadow = true; scene.add(c); }
+}
+function clear(x,z){ return !(Math.abs(x)<7.5 && z>-14 && z<-2) && !(Math.abs(x)<2.6 && z>-3 && z<17) && !(x>8.5&&x<16.5&&z>-7&&z<0) && Math.hypot(x,z)<21.5; }
+let placed = 0;
+while (placed < 26) { const a = rand(0,Math.PI*2), r = rand(8,21); const x = Math.cos(a)*r, z = Math.sin(a)*r; if (clear(x,z)) { tree(x,z); placed++; } }
+for (let i=0;i<30;i++){ const a = rand(0,Math.PI*2), r = rand(5,22); const x=Math.cos(a)*r, z=Math.sin(a)*r; if(!clear(x,z)) continue; const b = new THREE.Mesh(new THREE.IcosahedronGeometry(rand(.25,.5),1), mat(pick(['#6f8c57','#87a066','#a3956b']),{flatShading:true})); b.position.set(x,.15,z); b.scale.y=.7; b.castShadow=true; scene.add(b); }
+for (let i=0;i<10;i++){ const a = rand(0,Math.PI*2), r = rand(21,24.5); const rk = new THREE.Mesh(new THREE.DodecahedronGeometry(rand(.3,.8)), mat('#9c948c',{flatShading:true})); rk.position.set(Math.cos(a)*r,.1,Math.sin(a)*r); rk.castShadow = true; scene.add(rk); }
+
+// fireflies
+const ffN = 90, ffGeo = new THREE.BufferGeometry(), ffPos = new Float32Array(ffN*3), ffSeed = [];
+for (let i=0;i<ffN;i++){ const a=rand(0,Math.PI*2), r=rand(3,21); ffSeed.push([Math.cos(a)*r, rand(.4,3), Math.sin(a)*r, rand(0,10)]); }
+ffGeo.setAttribute('position', new THREE.BufferAttribute(ffPos,3));
+const fireflies = new THREE.Points(ffGeo, new THREE.PointsMaterial({color:'#ffe9a8', size:.09, transparent:true, opacity:.85, blending:THREE.AdditiveBlending, depthWrite:false}));
+scene.add(fireflies);
+
+function groundY(x,z){
+  if (x>SHALA.x0 && x<SHALA.x1 && z>SHALA.z0 && z<SHALA.z1) return SHALA.h + .03;
+  if (x>DECK.x0 && x<DECK.x1 && z>DECK.z0 && z<DECK.z1) return DECK.h;
+  return 0;
+}
+
+/* ---------- yogi character ---------- */
+const SKIN = ['#f2d0b4','#e8bf9c','#d9a982','#f5d9c2'];
+const HAIR = ['#2e2420','#4a3426','#6b4a33','#1f1c1f','#8a5a3c'];
+const OUTFIT = ['#e8b7a3','#a9c0a0','#c7b8dc','#f0d6a8','#9fb7c4','#d9a3a8','#efe6da'];
+const PANTS = ['#4b4a5e','#6b5a70','#5b6b5e','#7a6355','#3f4a5a'];
+
+function randomLook(){ return {skin:pick(SKIN), hair:pick(HAIR), top:pick(OUTFIT), pants:pick(PANTS)}; }
+function sanitizeLook(l){ const r = randomLook(); const ok = v => typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v); return l ? {skin:ok(l.skin)?l.skin:r.skin, hair:ok(l.hair)?l.hair:r.hair, top:ok(l.top)?l.top:r.top, pants:ok(l.pants)?l.pants:r.pants} : r; }
+function makeYogi(look){
+  const skin = mat(look.skin), hair = mat(look.hair), top = mat(look.top), pants = mat(look.pants);
+  const g = new THREE.Group(), root = new THREE.Group(); g.add(root);
+  const hips = new THREE.Group(); hips.position.y = .5; root.add(hips);
+  const parts = [];
+  const add = (parent, geo, m, x,y,z) => { const ms = new THREE.Mesh(geo,m); ms.position.set(x,y,z); ms.castShadow = true; parent.add(ms); parts.push(ms); return ms; };
+  const legGeo = new THREE.CylinderGeometry(.085,.07,.46,10);
+  const legL = new THREE.Group(); legL.position.set(-.1,0,0); hips.add(legL); add(legL, legGeo, pants, 0,-.23,0); add(legL,new THREE.SphereGeometry(.075,10,8),skin,0,-.47,.03);
+  const legR = new THREE.Group(); legR.position.set(.1,0,0);  hips.add(legR); add(legR, legGeo, pants, 0,-.23,0); add(legR,new THREE.SphereGeometry(.075,10,8),skin,0,-.47,.03);
+  const torso = new THREE.Group(); hips.add(torso);
+  add(torso, new THREE.CylinderGeometry(.17,.215,.46,16), top, 0,.23,0);
+  add(torso, new THREE.SphereGeometry(.215,16,8,0,Math.PI*2,Math.PI/2,Math.PI/2), pants, 0,.005,0).rotation.x = 0;
+  const chest = torso.children[0];
+  const head = new THREE.Group(); head.position.y = .78; torso.add(head);
+  add(head, new THREE.SphereGeometry(.3,24,18), skin, 0,0,0);
+  const hairCap = add(head, new THREE.SphereGeometry(.315,24,18,0,Math.PI*2,0,Math.PI*.55), hair, 0,.02,-.02); hairCap.rotation.x = -.35;
+  add(head, new THREE.SphereGeometry(.12,14,12), hair, 0,.27,-.14);
+  const eyeM = mat('#2a201c'); add(head,new THREE.SphereGeometry(.028,8,8),eyeM,-.1,-.02,.275); add(head,new THREE.SphereGeometry(.028,8,8),eyeM,.1,-.02,.275);
+  const blush = mat('#f0a49a'); add(head,new THREE.SphereGeometry(.04,8,8),blush,-.17,-.09,.235).scale.set(1,.6,.5); add(head,new THREE.SphereGeometry(.04,8,8),blush,.17,-.09,.235).scale.set(1,.6,.5);
+  const armGeo = new THREE.CylinderGeometry(.058,.05,.36,10);
+  const armL = new THREE.Group(); armL.position.set(-.22,.4,0); torso.add(armL); add(armL,armGeo,top,0,-.18,0); add(armL,new THREE.SphereGeometry(.062,10,8),skin,0,-.38,0);
+  const armR = new THREE.Group(); armR.position.set(.22,.4,0);  torso.add(armR); add(armR,armGeo,top,0,-.18,0); add(armR,new THREE.SphereGeometry(.062,10,8),skin,0,-.38,0);
+  scene.add(g);
+  return {g, root, hips, torso, chest, head, armL, armR, legL, legR, parts};
+}
+
+const POSES = {
+  stand:    {ry:0, rx:0, tx:0, aL:[0,-.12], aR:[0,.12], lL:[0,0], lR:[0,0]},
+  namaste:  {ry:0, rx:0, tx:.28, aL:[-1.2,.62], aR:[-1.2,-.62], lL:[0,0], lR:[0,0]},
+  sit:      {ry:-.4, rx:0, tx:0, aL:[-.55,-.12], aR:[-.55,.12], lL:[-1.45,-.5], lR:[-1.45,.5]},
+  tree:     {ry:0, rx:0, tx:0, aL:[0,-3.22], aR:[0,3.22], lL:[0,0], lR:[-.35,1.15]},
+  downdog:  {ry:.12, rx:0, tx:2.0, aL:[-2.4,-.08], aR:[-2.4,.08], lL:[.7,-.05], lR:[.7,.05], ls:1.4},
+  child:    {ry:-.38, rx:0, tx:1.3, aL:[-2.95,-.15], aR:[-2.95,.15], lL:[1.52,-.12], lR:[1.52,.12]},
+  savasana: {ry:.32, rx:-Math.PI/2, tx:0, aL:[0,-.45], aR:[0,.45], lL:[0,-.12], lR:[0,.12]},
+};
+const POSE_NAME = {tree:'나무 자세', downdog:'아래를 보는 개', child:'아이 자세', savasana:'누워 쉬기', sit:'호흡'};
+
+function lerpAngle(a,b,t){ let d = ((b-a+Math.PI)%(Math.PI*2)) - Math.PI; if (d < -Math.PI) d += Math.PI*2; return a + d*t; }
+
+class Yogi {
+  constructor(name, isMe, look, id){
+    this.name = name; this.isMe = isMe; this.id = id; this.m = makeYogi(look || randomLook());
+    this.pos = new THREE.Vector3(); this.target = null; this.heading = Math.PI; this.faceTo = null;
+    this.pose = 'stand'; this.tempPose = null; this.tempUntil = 0; this.walkPhase = Math.random()*6; this.breathe = false;
+    this.cur = JSON.parse(JSON.stringify(POSES.stand)); this.speed = isMe ? 2.6 : rand(1.2,1.7);
+    this.m.parts.forEach(p => p.userData.owner = this);
+    const lbl = document.createElement('div'); lbl.className = 'lbl' + (isMe ? ' me' : ''); lbl.textContent = isMe ? '나 · ' + name : name; $('labels').appendChild(lbl); this.lbl = lbl; this.lblUntil = 0;
+    const bub = document.createElement('div'); bub.className = 'bub'; bub.textContent = '🙏'; $('labels').appendChild(bub); this.bub = bub; this.bubUntil = 0;
+  }
+  remove(){ scene.remove(this.m.g); this.lbl.remove(); this.bub.remove(); }
+  walkTo(x,z){ this.target = new THREE.Vector3(x,0,z); this.pose = 'stand'; this.faceTo = null; }
+  setPose(p, face){ this.target = null; this.pose = p; if (face !== undefined) this.faceTo = face; }
+  namaste(){ this.tempPose = 'namaste'; this.tempUntil = now + 1.7; this.bubUntil = now + 1.8; }
+  showName(sec=2.6){ this.lblUntil = now + sec; }
+  update(dt){
+    let walking = false;
+    if (this.target) {
+      const d = new THREE.Vector3(this.target.x - this.pos.x, 0, this.target.z - this.pos.z);
+      const dist = d.length();
+      if (dist < .08) { this.target = null; this.onArrive && this.onArrive(); }
+      else { d.normalize(); const step = Math.min(dist, this.speed*dt); this.pos.addScaledVector(d, step); this.heading = lerpAngle(this.heading, Math.atan2(d.x,d.z), Math.min(1,dt*10)); walking = true; }
+    } else if (this.faceTo !== null && this.faceTo !== undefined) {
+      this.heading = lerpAngle(this.heading, this.faceTo, Math.min(1,dt*5));
+    }
+    const gy = groundY(this.pos.x, this.pos.z);
+    this.pos.y += (gy - this.pos.y) * Math.min(1, dt*14);
+    this.m.g.position.copy(this.pos); this.m.g.rotation.y = this.heading;
+
+    const active = (this.tempPose && now < this.tempUntil) ? this.tempPose : (walking ? 'stand' : this.pose);
+    const P = POSES[active] || POSES.stand, c = this.cur, k = Math.min(1, dt*(active === 'savasana' || active === 'downdog' || active==='child' ? 3 : 6));
+    if (c.ls === undefined) c.ls = 1;
+    for (const key of ['ry','rx','tx']) c[key] += (P[key]-c[key])*k;
+    c.ls += ((P.ls||1) - c.ls)*k;
+    for (const key of ['aL','aR','lL','lR']) { c[key][0] += (P[key][0]-c[key][0])*k; c[key][1] += (P[key][1]-c[key][1])*k; }
+    let swing = 0;
+    if (walking) { this.walkPhase += dt*this.speed*4.2; swing = Math.sin(this.walkPhase); }
+    const m = this.m;
+    m.root.position.y = c.ry + (walking ? Math.abs(Math.cos(this.walkPhase))*.04 : 0);
+    m.root.rotation.x = c.rx;
+    m.torso.rotation.x = c.tx;
+    m.armL.rotation.set(c.aL[0] + swing*.55, 0, c.aL[1]); m.armR.rotation.set(c.aR[0] - swing*.55, 0, c.aR[1]);
+    m.legL.scale.y = m.legR.scale.y = c.ls;
+    m.legL.rotation.set(c.lL[0] - swing*.6, 0, c.lL[1]); m.legR.rotation.set(c.lR[0] + swing*.6, 0, c.lR[1]);
+    // breathing
+    const b = (this.breathe || active==='sit' || active==='savasana') ? (Math.sin(now*Math.PI*2/(this.isMe&&this.breathe?10:8) - Math.PI/2)+1)/2 : (Math.sin(now*1.6+this.walkPhase)+1)/2*.3;
+    m.chest.scale.set(1+b*.07, 1+b*.03, 1+b*.07);
+    m.head.position.y = .78 + b*.012;
+  }
+  updateDom(){
+    const hp = new THREE.Vector3(); this.m.head.getWorldPosition(hp);
+    hp.y += .48; const v = hp.clone().project(camera);
+    const vis = v.z < 1 && Math.abs(v.x) < 1.1 && Math.abs(v.y) < 1.1;
+    const x = (v.x+1)/2*innerWidth, y = (1-v.y)/2*innerHeight;
+    const showL = vis && (namesOn || now < this.lblUntil);
+    this.lbl.style.left = x+'px'; this.lbl.style.top = y+'px'; this.lbl.classList.toggle('show', showL);
+    const showB = vis && now < this.bubUntil;
+    this.bub.style.left = x+'px'; this.bub.style.top = (y - (showL ? 22 : 0))+'px'; this.bub.classList.toggle('show', showB);
+  }
+}
+
+/* ---------- people ---------- */
+const ADJ = ['고요한','느긋한','다정한','잔잔한','포근한','맑은','따스한','은은한','느린','가벼운'];
+const NOUN = ['숨','파도','노을','바람','구름','물결','햇살','나뭇잎','달빛','이슬'];
+const used = new Set();
+function uniqueName(){ let n; do { n = pick(ADJ)+' '+pick(NOUN); } while (used.has(n)); used.add(n); return n; }
+
+let namesOn = false;
+let saved = null; try { saved = JSON.parse(localStorage.getItem('soom-me') || 'null'); } catch(e) {}
+const myId = Math.random().toString(36).slice(2,10);
+const myLook = saved && saved.look ? sanitizeLook(saved.look) : randomLook();
+const myName = (saved && typeof saved.name === 'string' && saved.name) ? saved.name.slice(0,20) : uniqueName();
+used.add(myName);
+try { localStorage.setItem('soom-me', JSON.stringify({name:myName, look:myLook})); } catch(e) {}
+const me = new Yogi(myName, true, myLook, myId);
+me.pos.set(rand(-1.8,1.8),0,rand(10.5,13)); me.heading = Math.PI;
+
+const npcs = [];
+const GARDEN_SPOTS = [[-5,3],[5,4],[-8,-1],[8,8],[-3,10],[4,14],[-10,6],[12.4,-3.5],[11.2,-4.6],[13.6,-4.6],[-12,-6],[9,2]];
+function freeMat(){ const free = mats.filter(m => !m.taken); return free.length ? pick(free) : null; }
+function npcDecide(n){
+  if (n.mat) { n.mat.taken = null; n.mat = null; }
+  if (Math.random() < .68) {
+    const m = freeMat();
+    if (m) { m.taken = n; n.mat = m; n.walkTo(m.x + rand(-.05,.05), m.z + .2); n.onArrive = () => { n.faceTo = Math.PI; n.pose = pick(['sit','sit','tree','downdog','child','savasana']); n.until = now + rand(12,28); }; return; }
+  }
+  const [x,z] = pick(GARDEN_SPOTS);
+  n.walkTo(x + rand(-.8,.8), z + rand(-.8,.8));
+  n.onArrive = () => { const onDeck = groundY(n.pos.x,n.pos.z) === DECK.h; n.faceTo = onDeck ? Math.PI*.85 : rand(-Math.PI,Math.PI); n.pose = onDeck ? pick(['sit','sit','savasana']) : pick(['stand','sit','stand']); n.until = now + rand(8,18); };
+}
+for (let i=0;i<(ONLINE?0:8);i++){
+  const n = new Yogi(uniqueName(), false);
+  n.until = 0; n.nextGreet = 0;
+  const m = freeMat();
+  if (i < 5 && m) { m.taken = n; n.mat = m; n.pos.set(m.x, .33, m.z + .2); n.heading = Math.PI; n.faceTo = Math.PI; n.pose = pick(['sit','tree','downdog','child','savasana']); n.until = rand(6,22); }
+  else { const [x,z] = pick(GARDEN_SPOTS); n.pos.set(x+rand(-1,1), 0, z+rand(-1,1)); n.heading = rand(0,6); n.until = rand(2,10); }
+  npcs.push(n);
+}
+const remotes = new Map();
+const everyone = () => [me, ...npcs, ...remotes.values()];
+function renderVisitors(){
+  $('countBtn').textContent = everyone().length + '/100';
+  $('visitorList').innerHTML = everyone().map(p => `<li>${p.isMe ? '<b>'+esc(p.name)+'</b>' : esc(p.name)}<span>${p.isMe ? '나' : (POSE_NAME[p.pose] || (p.target ? '걷는 중' : '머무는 중'))}</span></li>`).join('');
+}
+renderVisitors();
+
+/* ---------- realtime ---------- */
+let netStatus = ONLINE ? 'connecting' : 'demo';
+function updateRoomLabel(){
+  const t = !ONLINE ? '데모' : netStatus === 'online' ? '노을 샬라 · ' + ROOM : netStatus === 'offline' ? '연결이 끊겼어요' : '연결 중…';
+  $('roomLbl').textContent = t;
+  $('proto').style.display = ONLINE ? 'none' : '';
+}
+function makeTransport(h){
+  if (LOCAL_TEST) {
+    const bc = new BroadcastChannel('soom-' + ROOM);
+    bc.onmessage = e => { const m = e.data || {}; if (m.ev === 'leave') h.leave(m.p.id); else if (h[m.ev]) h[m.ev](m.p); };
+    addEventListener('pagehide', () => bc.postMessage({ev:'leave', p:{id:myId}}));
+    setTimeout(() => h.status('online'), 50);
+    return { send: (ev,p) => bc.postMessage({ev, p}) };
+  }
+  let ch = null, ready = false;
+  const sc = document.createElement('script');
+  sc.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+  sc.onload = () => {
+    try {
+      const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      ch = client.channel('soom:' + ROOM, {config:{broadcast:{self:false}, presence:{key:myId}}});
+      ch.on('broadcast', {event:'state'}, ({payload}) => h.state(payload));
+      ch.on('broadcast', {event:'greet'}, ({payload}) => h.greet(payload));
+      ch.on('presence', {event:'leave'}, ({key}) => h.leave(key));
+      ch.subscribe(async st => {
+        if (st === 'SUBSCRIBED') { ready = true; h.status('online'); try { await ch.track({id:myId}); } catch(e) {} }
+        else if (st === 'CHANNEL_ERROR' || st === 'TIMED_OUT' || st === 'CLOSED') { ready = false; h.status('offline'); }
+      });
+    } catch(e) { h.status('offline'); }
+  };
+  sc.onerror = () => h.status('offline');
+  document.head.appendChild(sc);
+  return { send: (ev,p) => { if (ch && ready) ch.send({type:'broadcast', event:ev, payload:p}).catch(() => {}); } };
+}
+function myState(){
+  return {id:myId, name:myName, look:myLook, x:+me.pos.x.toFixed(2), z:+me.pos.z.toFixed(2), h:+me.heading.toFixed(2), pose:me.pose, b:me.breathe ? 1 : 0};
+}
+let lastSent = -9, lastSig = '';
+function sendState(force){
+  if (!net || netStatus !== 'online') return;
+  const st = myState(); const sig = [st.x, st.z, st.h, st.pose, st.b].join(',');
+  if (!force) { if (now - lastSent < .2) return; if (sig === lastSig && now - lastSent < 3) return; }
+  lastSig = sig; lastSent = now; net.send('state', st);
+}
+function dropRemote(id){ const r = remotes.get(id); if (r) { r.remove(); remotes.delete(id); renderVisitors(); } }
+const net = ONLINE ? makeTransport({
+  state: p => {
+    if (!p || typeof p.id !== 'string' || p.id === myId || !isFinite(p.x) || !isFinite(p.z)) return;
+    let r = remotes.get(p.id);
+    if (!r) {
+      if (remotes.size >= 99) return;
+      r = new Yogi(String(p.name || '방문객').slice(0,20), false, sanitizeLook(p.look), p.id);
+      r.pos.set(p.x, groundY(p.x,p.z), p.z); r.heading = +p.h || 0; remotes.set(p.id, r);
+      renderVisitors(); sendState(true);
+    }
+    r.lastSeen = now; r.net = {x:p.x, z:p.z, h:+p.h || 0};
+    r.pose = POSES[p.pose] ? p.pose : 'stand'; r.breathe = !!p.b;
+  },
+  greet: p => { const r = p && remotes.get(p.id); if (r) { r.namaste(); bowlSound(.35, 247); } },
+  leave: id => dropRemote(id),
+  status: st => { netStatus = st; updateRoomLabel(); if (st === 'online') sendState(true); },
+}) : null;
+updateRoomLabel();
+function updateRemotes(dt){
+  for (const r of [...remotes.values()]) {
+    if (now - r.lastSeen > 12) { dropRemote(r.id); continue; }
+    if (r.net) {
+      const d = Math.hypot(r.net.x - r.pos.x, r.net.z - r.pos.z);
+      if (d > 6) { r.pos.x = r.net.x; r.pos.z = r.net.z; r.target = null; }
+      else if (d > .06) { r.target = new THREE.Vector3(r.net.x, 0, r.net.z); r.speed = Math.max(2.4, d*3); }
+      r.faceTo = r.net.h;
+    }
+    r.update(dt);
+  }
+}
+
+/* ---------- audio ---------- */
+let actx = null, soundOn = false, master = null;
+function initAudio(){
+  if (actx) return;
+  try {
+    actx = new (window.AudioContext || window.webkitAudioContext)();
+    master = actx.createGain(); master.gain.value = 0; master.connect(actx.destination);
+    // waves: filtered noise with slow swell
+    const len = actx.sampleRate*4, buf = actx.createBuffer(1,len,actx.sampleRate), d = buf.getChannelData(0);
+    let last = 0; for (let i=0;i<len;i++){ last = (last + .02*(Math.random()*2-1)) / 1.02; d[i] = last*3.2; }
+    const src = actx.createBufferSource(); src.buffer = buf; src.loop = true;
+    const lp = actx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 520;
+    const wg = actx.createGain(); wg.gain.value = .18;
+    const lfo = actx.createOscillator(); lfo.frequency.value = .085; const lg = actx.createGain(); lg.gain.value = .14; lfo.connect(lg); lg.connect(wg.gain);
+    src.connect(lp); lp.connect(wg); wg.connect(master); src.start(); lfo.start();
+  } catch(e) { actx = null; }
+}
+function bowlSound(vol=1, base=196){
+  if (!actx || !soundOn) return;
+  const t = actx.currentTime;
+  [[1,.5,7],[2.71,.22,5],[5.12,.1,3.5],[1.005,.4,7]].forEach(([r,g,dur]) => {
+    const o = actx.createOscillator(), gn = actx.createGain(); o.type = 'sine'; o.frequency.value = base*r;
+    gn.gain.setValueAtTime(0,t); gn.gain.linearRampToValueAtTime(g*.22*vol, t+.02); gn.gain.exponentialRampToValueAtTime(.0001, t+dur);
+    o.connect(gn); gn.connect(master); o.start(t); o.stop(t+dur+.1);
+  });
+}
+$('soundBtn').onclick = () => {
+  initAudio(); if (!actx) return;
+  soundOn = !soundOn; actx.resume && actx.resume();
+  master.gain.setTargetAtTime(soundOn ? .9 : 0, actx.currentTime, .4);
+  $('soundIcon').innerHTML = soundOn ? '<path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>' : '<path d="M11 5 6 9H3v6h3l5 4z"/><path d="m22 9-6 6M16 9l6 6"/>';
+  $('soundBtn').setAttribute('aria-label', soundOn ? '소리 끄기' : '소리 켜기');
+  if (soundOn) bowlSound(.7);
+};
+
+/* ---------- actions ---------- */
+const asanaMenu = $('asanaMenu');
+function setActive(){
+  $('asanaBtn').classList.toggle('on', ['tree','downdog','child','savasana'].includes(me.pose));
+  $('breathBtn').classList.toggle('on', me.breathe);
+}
+function stopBreath(){ me.breathe = false; $('breath').classList.remove('show'); }
+function onMat(){ return mats.find(m => Math.abs(m.x - me.pos.x) < .7 && Math.abs(m.z - me.pos.z) < 1.2); }
+
+$('namasteBtn').onclick = () => {
+  me.namaste(); bowlSound(.8, 220); if (net) net.send('greet', {id:myId});
+  npcs.forEach(n => { if (n.pos.distanceTo(me.pos) < 9) { const delay = rand(.5,1.8); setTimeout(() => { n.namaste(); if (n.faceTo === null || !n.mat) {} }, delay*1000); } });
+};
+$('asanaBtn').onclick = e => { e.stopPropagation(); asanaMenu.classList.toggle('open'); };
+asanaMenu.querySelectorAll('button').forEach(b => b.onclick = e => {
+  e.stopPropagation(); asanaMenu.classList.remove('open');
+  const p = b.dataset.pose; stopBreath();
+  if (p === 'stop') me.setPose('stand');
+  else { const m = onMat(); me.setPose(p, m ? Math.PI : me.heading); }
+  setActive();
+});
+let breathTimer = null;
+function breathLoop(){
+  if (!me.breathe) return;
+  const ring = $('ring');
+  const phase = (en, ko, sec, scale, next) => {
+    if (!me.breathe) return;
+    $('breathEn').textContent = en; $('breathKo').textContent = ko;
+    ring.style.transitionDuration = sec + 's'; ring.style.transform = 'scale(' + scale + ')';
+    let left = sec; $('breathN').textContent = left;
+    const iv = setInterval(() => { left--; if (left > 0 && me.breathe) $('breathN').textContent = left; }, 1000);
+    breathTimer = setTimeout(() => { clearInterval(iv); next(); }, sec*1000);
+  };
+  phase('Inhale', '들이쉬기', 4, 1, () => phase('Exhale', '내쉬기', 6, .55, breathLoop));
+}
+$('breathBtn').onclick = () => {
+  asanaMenu.classList.remove('open');
+  if (me.breathe) { stopBreath(); me.setPose('stand'); }
+  else { const m = onMat(); me.setPose('sit', m ? Math.PI : me.heading); me.breathe = true; $('breath').classList.add('show'); clearTimeout(breathTimer); breathLoop(); }
+  setActive();
+};
+document.addEventListener('click', () => asanaMenu.classList.remove('open'));
+$('namesBtn').onclick = () => { namesOn = !namesOn; $('namesBtn').style.background = namesOn ? 'rgba(255,255,255,.16)' : ''; };
+$('countBtn').onclick = () => { renderVisitors(); $('visitors').classList.toggle('open'); $('fee').classList.remove('open'); };
+$('closeVisitors').onclick = () => $('visitors').classList.remove('open');
+function toast(t){ const el = $('toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('show'), 1800); }
+$('feeBtn').onclick = () => { $('fee').classList.toggle('open'); $('visitors').classList.remove('open'); };
+$('closeFee').onclick = () => $('fee').classList.remove('open');
+$('copyAcct').onclick = async () => {
+  const acct = '토스뱅크 100007262511';
+  try { await navigator.clipboard.writeText(acct); toast('계좌번호를 복사했어요 🙏'); }
+  catch(e) {
+    try { const ta = document.createElement('textarea'); ta.value = acct; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('계좌번호를 복사했어요 🙏'); }
+    catch(e2) { toast('토스뱅크 1000-0726-2511'); }
+  }
+};
+
+/* ---------- group class demo ---------- */
+let classOn = false;
+const CLASS_SEQ = [['sit','호흡으로 마음 모으기',10],['tree','나무 자세',9],['downdog','아래를 보는 개',9],['child','아이 자세',9],['savasana','누워 쉬기',14]];
+function runClass(){
+  if (classOn) return; classOn = true; $('classBtn').disabled = true; stopBreath(); setActive();
+  // NPCs drop what they're doing and face the altar
+  npcs.forEach(n => { n.target = null; n.onArrive = null; });
+  let i = 0;
+  const step = () => {
+    if (i >= CLASS_SEQ.length) {
+      classOn = false; $('classBtn').disabled = false; $('caption').classList.remove('show');
+      [me, ...npcs].forEach(p => { p.setPose('stand'); }); npcs.forEach(n => n.until = now + rand(2,8));
+      me.namaste(); npcs.forEach(n => setTimeout(() => n.namaste(), rand(200,1400))); bowlSound(1);
+      setActive(); return;
+    }
+    const [pose, label, sec] = CLASS_SEQ[i++];
+    $('capText').textContent = label; $('caption').classList.add('show');
+    bowlSound(.9);
+    [me, ...npcs].forEach((p,k) => setTimeout(() => p.setPose(pose, groundY(p.pos.x,p.pos.z) > .25 ? Math.PI : p.heading), p.isMe ? 0 : rand(100,700)));
+    setTimeout(step, sec*1000);
+  };
+  step();
+}
+$('classBtn').onclick = runClass;
+// 함께 수련: 한국 시간 정각에 모든 접속자 화면에서 같은 순서로 시작돼요
+const SLOTS = [[7,'아침 태양 경배'],[19,'노을 스트레칭'],[22,'요가 니드라']];
+function kst(){ const d = new Date(Date.now() + 9*3600e3); return {h:d.getUTCHours(), m:d.getUTCMinutes(), s:d.getUTCSeconds()}; }
+function nextClassLabel(){
+  const t = kst(); const sl = SLOTS.find(([sh]) => sh > t.h) || SLOTS[0];
+  $('nextClass').textContent = String(sl[0]).padStart(2,'0') + ':00 ' + sl[1];
+}
+nextClassLabel();
+setInterval(() => {
+  const t = kst(); nextClassLabel();
+  if (ONLINE && !classOn && t.m === 0 && t.s < 3 && SLOTS.some(([sh]) => sh === t.h)) runClass();
+}, 1000);
+
+/* ---------- camera & input ---------- */
+let yaw = 0, pitch = .38, dist = 7.5;
+const keys = {};
+addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  keys[e.key.toLowerCase()] = true;
+  if (e.key === '1') $('namasteBtn').click();
+  if (e.key === '2') $('asanaBtn').click();
+  if (e.key === '3') $('breathBtn').click();
+});
+addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+const cvs = renderer.domElement; let drag = null;
+const pointers = new Map(); let pinchD = 0;
+cvs.addEventListener('pointerdown', e => { cvs.setPointerCapture(e.pointerId); pointers.set(e.pointerId,{x:e.clientX,y:e.clientY}); drag = {x:e.clientX, y:e.clientY, sx:e.clientX, sy:e.clientY, moved:false}; if (pointers.size===2){ const [a,b]=[...pointers.values()]; pinchD = Math.hypot(a.x-b.x,a.y-b.y);} });
+cvs.addEventListener('pointermove', e => {
+  if (!pointers.has(e.pointerId)) return;
+  pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if (pointers.size === 2) { const [a,b]=[...pointers.values()]; const d = Math.hypot(a.x-b.x,a.y-b.y); dist = THREE.MathUtils.clamp(dist * pinchD/d, 3.5, 16); pinchD = d; if (drag) drag.moved = true; return; }
+  if (!drag) return;
+  const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY;
+  if (Math.hypot(e.clientX-drag.sx, e.clientY-drag.sy) > 6) drag.moved = true;
+  if (drag.moved) { yaw -= dx*.006; pitch = THREE.MathUtils.clamp(pitch + dy*.004, .08, 1.2); }
+});
+const ray = new THREE.Raycaster();
+cvs.addEventListener('pointerup', e => {
+  pointers.delete(e.pointerId);
+  if (!drag || drag.moved) { if (!pointers.size) drag = null; return; }
+  const p = new THREE.Vector2((e.clientX/innerWidth)*2-1, -(e.clientY/innerHeight)*2+1);
+  ray.setFromCamera(p, camera);
+  const people = everyone().flatMap(y => y.m.parts);
+  const hitP = ray.intersectObjects(people)[0];
+  if (hitP) { hitP.object.userData.owner.showName(); drag = null; return; }
+  const hit = ray.intersectObjects(walkables)[0];
+  if (hit) {
+    let {x,z} = hit.point; const r = Math.hypot(x,z); if (r > 23.5) { x *= 23.5/r; z *= 23.5/r; }
+    // clicking a mat: walk to its centre
+    const m = mats.find(m => Math.abs(m.x-x) < .55 && Math.abs(m.z-z) < 1.05);
+    if (m) { x = m.x; z = m.z + .2; }
+    stopBreath(); me.walkTo(x,z); me.onArrive = m ? () => { me.faceTo = Math.PI; } : null; setActive();
+  }
+  drag = null;
+});
+cvs.addEventListener('wheel', e => { e.preventDefault(); dist = THREE.MathUtils.clamp(dist * (1 + Math.sign(e.deltaY)*.08), 3.5, 16); }, {passive:false});
+addEventListener('resize', () => { camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+
+/* ---------- loop ---------- */
+const camTarget = new THREE.Vector3();
+let lastList = 0;
+function tick(){
+  const dt = Math.min(.05, clock.getDelta()); now += dt;
+  // keyboard move
+  let fx = 0, fz = 0;
+  if (keys['w']||keys['arrowup']) fz -= 1; if (keys['s']||keys['arrowdown']) fz += 1;
+  if (keys['a']||keys['arrowleft']) fx -= 1; if (keys['d']||keys['arrowright']) fx += 1;
+  if (fx || fz) {
+    const len = Math.hypot(fx,fz); fx/=len; fz/=len;
+    const sx = Math.cos(yaw), sz = -Math.sin(yaw), wx = Math.sin(yaw), wz = Math.cos(yaw);
+    const dx = fx*sx + fz*wx, dz = fx*sz + fz*wz;
+    let nx = me.pos.x + dx*me.speed*dt, nz = me.pos.z + dz*me.speed*dt; const r = Math.hypot(nx,nz); if (r > 23.5) { nx *= 23.5/r; nz *= 23.5/r; }
+    if (me.pose !== 'stand' || me.breathe) { stopBreath(); me.pose = 'stand'; setActive(); }
+    me.target = null; me.faceTo = null; me.pos.x = nx; me.pos.z = nz; me.heading = lerpAngle(me.heading, Math.atan2(dx,dz), Math.min(1,dt*10));
+    me.walkPhase += dt*me.speed*4.2; me._kbWalk = true;
+  } else me._kbWalk = false;
+  me.update(dt);
+  if (me._kbWalk) { const s = Math.sin(me.walkPhase); me.m.legL.rotation.x = -s*.6; me.m.legR.rotation.x = s*.6; me.m.armL.rotation.x = s*.55; me.m.armR.rotation.x = -s*.55; }
+
+  updateRemotes(dt);
+  sendState(false);
+  // NPCs
+  for (const n of npcs) {
+    if (!classOn && !n.target && now > n.until) npcDecide(n);
+    // greet the player when passing nearby
+    if (!classOn && n.target && now > n.nextGreet && n.pos.distanceTo(me.pos) < 2.4) { n.namaste(); n.nextGreet = now + 25; }
+    n.update(dt);
+  }
+  // world anims
+  flames.forEach((f,i) => { f.scale.y = 1.6 + Math.sin(now*9+i*2)*.25; });
+  altarLight.intensity = 1.15 + Math.sin(now*7)*.08 + Math.sin(now*13)*.05;
+  for (let i=0;i<ffN;i++){ const s = ffSeed[i]; ffPos[i*3] = s[0] + Math.sin(now*.3+s[3])*1.2; ffPos[i*3+1] = s[1] + Math.sin(now*.7+s[3]*2)*.4; ffPos[i*3+2] = s[2] + Math.cos(now*.25+s[3])*1.2; }
+  ffGeo.attributes.position.needsUpdate = true;
+  fireflies.material.opacity = .6 + Math.sin(now*2)*.25;
+
+  // camera
+  camTarget.lerp(new THREE.Vector3(me.pos.x, me.pos.y + 1.05, me.pos.z), Math.min(1, dt*6));
+  camera.position.set(camTarget.x + Math.sin(yaw)*Math.cos(pitch)*dist, camTarget.y + Math.sin(pitch)*dist, camTarget.z + Math.cos(yaw)*Math.cos(pitch)*dist);
+  if (camera.position.y < .4) camera.position.y = .4;
+  camera.lookAt(camTarget);
+
+  renderer.render(scene, camera);
+  everyone().forEach(p => p.updateDom());
+  if (now - lastList > 2 && $('visitors').classList.contains('open')) { renderVisitors(); lastList = now; }
+  requestAnimationFrame(tick);
+}
+tick();
+setTimeout(() => { $('loader').style.opacity = 0; setTimeout(() => $('loader').remove(), 1300); }, 900);
+setTimeout(() => $('hint').style.opacity = 0, 9000);
+window.__yoga = {me, npcs, runClass, setYaw:v=>{yaw=v}, setDist:v=>{dist=v}, setPitch:v=>{pitch=v}};
+})();
+</script>
+</body>
+</html>
