@@ -500,7 +500,7 @@ function makeYogi(look){
   const armR = new THREE.Group(); armR.position.set(.22,.4,0);  torso.add(armR); add(armR,armGeo,top,0,-.18,0); add(armR,new THREE.SphereGeometry(.062,10,8),skin,0,-.38,0);
   // rolled-up mat carried on the back
   const matMat = mat(look.mat || pick(MAT_COLORS), {roughness:1});
-  const roll = new THREE.Mesh(new THREE.CylinderGeometry(.085,.085,.62,14), matMat); roll.rotation.z = Math.PI/2; roll.position.set(0,.34,-.25); roll.castShadow = true; torso.add(roll); parts.push(roll);
+  const roll = new THREE.Mesh(new THREE.CylinderGeometry(.075,.075,.5,14), matMat); roll.rotation.z = Math.PI/2 - .55; roll.position.set(0,.2,-.26); roll.castShadow = true; torso.add(roll); parts.push(roll);
   const laid = new THREE.Mesh(new THREE.BoxGeometry(.95,.03,1.95), matMat); laid.receiveShadow = true; laid.visible = false; scene.add(laid);
   scene.add(g);
   return {g, root, hips, torso, chest, head, armL, armR, legL, legR, parts, roll, laid};
