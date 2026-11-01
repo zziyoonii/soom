@@ -711,7 +711,7 @@ function updateRemotes(dt){
 }
 
 /* ---------- audio ---------- */
-let actx = null, soundOn = false, master = null;
+let actx = null, soundOn = false, master = null, waveGain = null, waveLfo = null;
 function initAudio(){
   if (actx) return;
   try {
@@ -725,6 +725,8 @@ function initAudio(){
     const wg = actx.createGain(); wg.gain.value = .18;
     const lfo = actx.createOscillator(); lfo.frequency.value = .085; const lg = actx.createGain(); lg.gain.value = .14; lfo.connect(lg); lg.connect(wg.gain);
     src.connect(lp); lp.connect(wg); wg.connect(master); src.start(); lfo.start();
+    waveGain = wg; waveLfo = lg;
+    if (me.breathe) waveBreath('in', 4);
   } catch(e) { actx = null; }
 }
 // 싱잉볼 종류: 각자 고른 볼 소리로 인사가 울려요
@@ -741,6 +743,20 @@ function tone(f, g, dur, t){
   const o = actx.createOscillator(), gn = actx.createGain(); o.type = 'sine'; o.frequency.value = f;
   gn.gain.setValueAtTime(0,t); gn.gain.linearRampToValueAtTime(g, t+.015); gn.gain.exponentialRampToValueAtTime(.0001, t+dur);
   o.connect(gn); gn.connect(master); o.start(t); o.stop(t+dur+.1);
+}
+// 호흡할 때는 파도가 숨에 맞춰 밀려오고(들숨) 쓸려 나가요(날숨)
+function waveBreath(dir, sec){
+  if (!actx || !waveGain) return;
+  const t = actx.currentTime, g = waveGain.gain;
+  g.cancelScheduledValues(t); g.setValueAtTime(g.value, t);
+  g.linearRampToValueAtTime(dir === 'in' ? .36 : .05, t + sec);
+  waveLfo.gain.cancelScheduledValues(t); waveLfo.gain.setTargetAtTime(0, t, .3);
+}
+function waveNormal(){
+  if (!actx || !waveGain) return;
+  const t = actx.currentTime, g = waveGain.gain;
+  g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(.18, t + 2);
+  waveLfo.gain.cancelScheduledValues(t); waveLfo.gain.setTargetAtTime(.14, t + 2, .5);
 }
 function bowlSound(vol=1, kind=myBowl){
   if (!actx || !soundOn) return;
@@ -785,7 +801,7 @@ function setActive(){
   $('asanaBtn').classList.toggle('on', ['tree','downdog','child','savasana'].includes(me.pose));
   $('breathBtn').classList.toggle('on', me.breathe);
 }
-function stopBreath(){ me.breathe = false; $('breath').classList.remove('show'); }
+function stopBreath(){ if (me.breathe) waveNormal(); me.breathe = false; $('breath').classList.remove('show'); }
 function onMat(){ return shalaMatAt(me.pos.x, me.pos.z); }
 
 $('namasteBtn').onclick = () => {
@@ -808,6 +824,7 @@ function breathLoop(){
   const ring = $('ring');
   const phase = (en, ko, sec, scale, next) => {
     if (!me.breathe) return;
+    waveBreath(en === 'Inhale' ? 'in' : 'out', sec);
     $('breathEn').textContent = en; $('breathKo').textContent = ko;
     ring.style.transitionDuration = sec + 's'; ring.style.transform = 'scale(' + scale + ')';
     let left = sec; $('breathN').textContent = left;
