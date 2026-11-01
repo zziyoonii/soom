@@ -171,14 +171,14 @@
     #classChip button{padding:8px 12px;font-size:12.5px}
     #hint{top:calc(72px + env(safe-area-inset-top));font-size:12px;white-space:normal;text-align:center;width:86%;line-height:1.5}
     #caption{top:calc(72px + env(safe-area-inset-top));max-width:90%}
-    #actions{left:10px;right:10px;transform:none;bottom:calc(10px + env(safe-area-inset-bottom));padding:6px;gap:4px;border-radius:26px}
-    #actions > div{flex:1}
-    #actions button.act{width:100%;padding:10px 0 8px;font-size:13px;border-radius:20px}
-    #actions button.act svg{width:26px;height:26px}
-    #asanaMenu{min-width:230px;padding:8px}
-    #asanaMenu button{padding:11px 14px;font-size:15px;flex-direction:column;align-items:flex-start;gap:1px}
-    #asanaMenu button span{font-size:11.5px}
-    #tools #soundMenu button{padding:11px 12px;font-size:15px}
+    #actions{bottom:calc(12px + env(safe-area-inset-bottom));padding:4px;gap:2px;border-radius:22px}
+    #actions button.act{width:68px;padding:6px 0 4px;font-size:11px;gap:2px;border-radius:18px}
+    #actions button.act svg{width:20px;height:20px}
+    #asanaMenu,#soundMenu{width:max-content;min-width:250px;max-width:calc(100vw - 24px)}
+    #asanaMenu{bottom:calc(100% + 10px)}
+    #asanaMenu button,#tools #soundMenu button{flex-direction:row;justify-content:space-between;align-items:baseline;gap:14px;padding:11px 14px;font-size:14.5px;white-space:nowrap}
+    #asanaMenu button span,#soundMenu button span{font-size:11.5px}
+    #hint{white-space:nowrap;width:auto;font-size:11.5px}
     #breath{top:42%;width:170px;height:170px}
     #proto{display:none}
     /* panels become bottom sheets */
@@ -264,7 +264,7 @@
   <div><button class="act" id="asanaBtn">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.5" r="2"/><path d="M12 7v7M12 9l-4-3M12 9l4-3M12 14l-3 6M12 14c1.5 0 3 .5 3.5 2"/></svg>아사나</button>
     <div id="asanaMenu" class="pill">
-      <button data-pose="class" class="classItem only-mobile-flex">🔔 함께 수련 미리 해보기 <span id="nextClassMenu">다음 07:00</span></button>
+      <button data-pose="class" class="classItem only-mobile-flex">🔔 함께 수련 미리보기 <span id="nextClassMenu">다음 07:00</span></button>
       <button data-pose="tree">나무 자세 <span>Vrksasana</span></button>
       <button data-pose="downdog">아래를 보는 개 <span>Adho Mukha</span></button>
       <button data-pose="child">아이 자세 <span>Balasana</span></button>
@@ -838,7 +838,7 @@ function nextClassLabel(){
   const t = kst(); const sl = SLOTS.find(([sh]) => sh > t.h) || SLOTS[0];
   $('nextClass').textContent = String(sl[0]).padStart(2,'0') + ':00 ' + sl[1];
   $('nextClassShort').textContent = String(sl[0]).padStart(2,'0') + ':00';
-  $('nextClassMenu').textContent = '다음 ' + String(sl[0]).padStart(2,'0') + ':00 ' + sl[1];
+  $('nextClassMenu').textContent = '다음 ' + String(sl[0]).padStart(2,'0') + ':00';
 }
 nextClassLabel();
 setInterval(() => {
