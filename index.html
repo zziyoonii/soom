@@ -103,8 +103,9 @@
   /* class caption */
   #caption{position:fixed;top:140px;left:50%;transform:translateX(-50%);padding:10px 20px;font-size:14px;display:none;z-index:4;text-align:center}
   #caption.show{display:block}
-  #caption small{display:block;color:var(--ink-soft);font-size:11.5px;margin-bottom:2px}
-  #caption b{font-family:'Gowun Batang',serif;font-size:17px;font-weight:700}
+  #caption{white-space:nowrap}
+  #caption small{display:inline;color:var(--ink-soft);font-size:12px;margin-right:8px}
+  #caption b{font-family:'Gowun Batang',serif;font-size:16px;font-weight:700}
 
   /* labels */
   #labels{position:fixed;inset:0;pointer-events:none;z-index:2}
@@ -170,7 +171,9 @@
     #classChip{padding:6px 6px 6px 12px;gap:8px;font-size:12.5px}
     #classChip button{padding:8px 12px;font-size:12.5px}
     #hint{top:calc(72px + env(safe-area-inset-top));font-size:12px;white-space:normal;text-align:center;width:86%;line-height:1.5}
-    #caption{top:calc(72px + env(safe-area-inset-top));max-width:90%}
+    #caption{top:calc(72px + env(safe-area-inset-top));padding:8px 16px}
+    #caption small{font-size:11px;margin-right:6px}
+    #caption b{font-size:14.5px}
     #actions{bottom:calc(12px + env(safe-area-inset-bottom));padding:4px;gap:2px;border-radius:22px}
     #actions button.act{width:68px;padding:6px 0 4px;font-size:11px;gap:2px;border-radius:18px}
     #actions button.act svg{width:20px;height:20px}
