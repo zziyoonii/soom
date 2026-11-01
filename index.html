@@ -90,6 +90,7 @@
   #asanaMenu button span{color:var(--ink-soft);font-size:12px}
   #asanaMenu button:hover{background:rgba(255,255,255,.1)}
   #asanaMenu button.stop{color:var(--accent)}
+  #asanaMenu .tip{font-size:11.5px;color:var(--ink-soft);padding:9px 12px 4px;margin-top:4px;border-top:1px solid rgba(255,255,255,.1);white-space:nowrap}
 
   /* breathing */
   #breath{position:fixed;left:50%;top:44%;transform:translate(-50%,-50%);width:180px;height:180px;display:none;place-items:center;pointer-events:none;z-index:3}
@@ -273,6 +274,7 @@
       <button data-pose="child">아이 자세 <span>Balasana</span></button>
       <button data-pose="savasana">누워 쉬기 <span>Savasana</span></button>
       <button data-pose="stop" class="stop">일어나기</button>
+      <div class="tip">🌊 바닷가에서 하면 매트 펴고 바다 봐요</div>
     </div>
   </div>
   <div><button class="act" id="breathBtn">
@@ -444,6 +446,7 @@ ffGeo.setAttribute('position', new THREE.BufferAttribute(ffPos,3));
 const fireflies = new THREE.Points(ffGeo, new THREE.PointsMaterial({color:'#ffe9a8', size:.09, transparent:true, opacity:.85, blending:THREE.AdditiveBlending, depthWrite:false}));
 scene.add(fireflies);
 
+let matTipShown = false;
 function shalaMatAt(x,z){ return mats.find(m => Math.abs(m.x - x) < .7 && Math.abs(m.z - z) < 1.2); }
 // 수련할 때 바라볼 방향: 샬라 매트면 제단, 바닷가면 바다, 아니면 지금 방향
 function practiceFace(y){ if (shalaMatAt(y.pos.x, y.pos.z)) return Math.PI; const r = Math.hypot(y.pos.x, y.pos.z); if (r > 15) return Math.atan2(y.pos.x, y.pos.z); if (groundY(y.pos.x,y.pos.z) === DECK.h) return Math.PI*.85; return y.heading; }
@@ -537,6 +540,7 @@ class Yogi {
     // 아무 데서나 수련하면 등에 멘 매트를 펼쳐요 (샬라 매트 위에서는 그대로)
     const posing = !walking && (this.pose !== 'stand' || this.breathe);
     const lay = posing && !shalaMatAt(this.pos.x, this.pos.z);
+    if (lay && !this.laid && this.isMe && !matTipShown) { matTipShown = true; toast(Math.hypot(this.pos.x,this.pos.z) > 15 ? '🌊 매트를 펴고 바다를 바라봐요' : '🧘 등에 멘 매트를 폈어요'); }
     if (lay && !this.laid) { this.laid = true; this.matAt = {x:this.pos.x, z:this.pos.z}; this.matS = this.matS || 0; }
     if (!lay) this.laid = false;
     this.matS = (this.matS || 0) + ((this.laid ? 1 : 0) - (this.matS || 0)) * Math.min(1, dt*5);
