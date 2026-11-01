@@ -135,7 +135,7 @@
   .maker{margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.1);font-size:12px;color:var(--ink-soft);display:flex;justify-content:space-between}
   .maker a{color:var(--ink);text-decoration:none}
   .maker a:hover{text-decoration:underline}
-  #toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);padding:9px 16px;font-size:13px;opacity:0;transition:opacity .3s;z-index:9;pointer-events:none}
+  #toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);padding:9px 16px;font-size:13px;white-space:nowrap;opacity:0;transition:opacity .3s;z-index:9;pointer-events:none}
   #toast.show{opacity:1}
   .panel p{font-size:12px;color:var(--ink-soft);margin-top:10px;line-height:1.6}
 
@@ -241,12 +241,12 @@
   <h3>함께 있는 사람 <button id="closeVisitors" aria-label="닫기">×</button></h3>
   <button class="fee-btn" id="namesToggle" style="margin:2px 0 8px">이름 모두 보기 <small>꺼짐</small></button>
   <ul id="visitorList"></ul>
-  <p>사람을 누르면 이름이 잠깐 보여요.<br>나마스테로 근처 사람들에게 인사해요.</p>
+  <p>사람을 누르면 이름이 잠깐 보여요.</p>
 </div>
 
 <div id="fee" class="panel right">
   <h3>매트 이용료 <button id="closeFee" aria-label="닫기">×</button></h3>
-  <p style="margin:0 0 10px;color:var(--ink)">오늘 매트 잘 쓰셨나요? 🙏<br><span style="color:var(--ink-soft)">이용료는 자율이에요. 안 내도 매트는 그대로 깔려 있어요.</span></p>
+  <p style="margin:0 0 10px;color:var(--ink)">오늘 매트 잘 쓰셨나요? 🙏<br><span style="color:var(--ink-soft)">이용료는 자율이에요. 안 내도 괜찮아요.</span></p>
   <div class="fee-menu">
     <div><span>매트 1장 하루 대여</span><span>1,000원</span></div>
     <div><span>요가 블록 추가</span><span>+500원</span></div>
@@ -256,7 +256,7 @@
   <img class="qr" alt="토스 송금 QR 코드" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAIAAAAiOjnJAAAfbElEQVR42u1ddbAcVfO9+fDgENyCu0NwdwkQAgGSoEkI7lQCFA4FhVYIDiksuBM0UDjBAsHdgru7/s5v+3vn67e3987d2d0Yff6amje+86b7nnv6dId//vknOBzNxn/8ETj8xXL4i+XwF8vh8BfL4S+Ww18sh8NfLIe/WA5/sRwOf7Ec/mI5/MVyOJqGf7Ix+eSTN+WMe+yxB48522yzycrddtuNK+eee25ZudNOO8WXceWVV/JQr776arzB4osvHp/02WefjbdcYYUV4i0fe+yxxEN48MEHueV9990nKx999NH4OCuuuCL32myzzeINbr75ZvnrCy+8UOIxXnbZZfHl7brrrvLX2WefnSt33333pvxweAHy3xb/Yjk8FDrGH0xcYp/VVltt/fXXr3ev00477aeffqpaefDBB//www9YWG655bjywAMP/Pbbb7HQoUOHY489Vlbut99+008/PRaWXHLJo48+WlZee+218Ym23XbbbbbZBguvvfYaN8Ch4i0RI+IgNddcc8VbXnrppaNHj5bj8OwImhIEP/jgA27Zu3fv+eefv+ri33zzzfiYvCR9bbj4xRZbLOd5vvvuuzw+8dxzz/33g/Gf/30yuDzVVFPhgdf7w917770jRoyoOmZLcqxDDz30n/ox00wzye79+/fP3AU/J6/zrbfeijdYeOGF4zt68cUX5a833XRTOsfKxxprrCHHWXPNNbly3XXXjc9+9913y1+ffPLJ9JM3c6zrrrsu85J23HHHxMHNHGvmmWcuce98Fz3HcniO5fAXy8TUU0/doTb22WefRg6+884789O64YYbxse/5ZZb4o/w9ttvL3+9/PLLuRJ0Roc8SD5RF1ZddVWeaKONNoo3GDZsmPz1mWeeSR+qR48echmLLrpoekveHZKtEs927733TjyEaaaZxr9YDg+FDqcbEtDD4/QQVG9pjq7POOMMoRtMLLPMMltuuaUs77///l9//TUWXnrppRtvvDFBInDl66+/zgH5Z599lrjOBRZYoFevXgm6gcfU94tILaNFzSxouoFbXn311QyCZCuer6CKwtBn5DG7d+++xBJLYOGbb74566yzZGW3bt2WWmqpqhPhceGhYUHHMl6zyUHk/3BjlG4ANZIO5Gm6gVM6Jpo4pZMGEqMSdAOhp3TSdMOyyy7Lvfg/g5cmPuYrr7zCva666ipZqfkwTunoHGvIkCHxoUy6Ya+99kqnzk43ODzHcniONWbw8ccfxyvnmWee999/v2olEpd33nkHCzvssAP9JhZZZBEkUiFi3iUjAbW99dZbhzbmHWEoRAKEkSNHxtzB448/XuuCH374YTOxi9GlS5e0Lwa4El5wfEzcWqatRufOncdBAw7/Yjn8xXL8e+iGww8//LfffkuEgzTdYILqBhk5V9ENehz+1VdfyQJGgqJoAG6sIFTUDdz9wgsvnHXWWbGAeWtQ86G9ugF0Q3yd8803X3qi94orrpDoDGUiFXY8FKL8RRddJMs9e/ZccMEFsfDpp59ecMEFVcf5/PPPQ6Ru0LdJyBNgJJXx4HTTTYeHk/p4WHQDbpzj9BiTTTbZWKYbWqpuMKHpBv17ZNINm2++efr4q6yyimy53nrrpbekukFP6RCabsif0qG6QdMNaSAlTV+nqxscnmM5HE1/sU499dQO9eOLL76Icyzo0eSvffr00d92WYk5E003yMrbb789LfQjttpqK26p0zVNN8gxN9544/Qtg3CXLddaa61QROJT2cGzn3/++bKyb9++aeYdoVC2BFGi9Rp8CGmhH0Ucc8wxR/xXJHMlfrjTTz/dv1gOD4UOpxsERxxxxJ9//tn4KXU1H4sp9Oj6+++/lwWIwblSJqRDpZiCuyPcfPnll1W7M+bq4TGKGT/55BOhG+JxeKEKA2yCjAFBc2eqBkA38JIQc+Wu9XViJkAC9CyzzBKU0E9GtZoL4DGhbuDuVMp/9913XIksQoQSWt3QtWvX9GR/JiaZZJKW0A0txcUXX5y+TrOYgjDLdXSOZYKvuFY3NEg3QOka8hSkLKYoBHOsQpjqhrECD4UOz7EcYUL0bjBBod8BBxzAlZhkSJwxX+iXD5N5N0Phbbfdxr2eeuqpBPMeShVTmMx7yBb6cWJK1A05dIPJvH/44Yc8KciOxC/IaTHgzDPPdObd4aHQ4XRDvaC6QUeQgQMH/vLLL6G2OILD4x9//FEW4N2AUbEsDxo0iOoGxovBgwfruX3SDTPOOGOoqBvSs/FQNwjdoCsXSE+//fbbQ4cO5QhRRnbQDqB2j3SDmCvBwYGF/2BA5p133lBRN8S3iYPHJRI69PM6wY/wgSAsxnQD4qOwJPrRISzK8c3EwyRQ4J0BB414Y17nyiuvzJU8EfTvssG4Tjecd955wZqLSPtjQcQS75UupjCndEx1w1133RUifyyYYXDlQw89lPDHKgf+zwRL3WDCLKYwYeZYEO3EZ4TVSrw7uLGgZvCcbnB4juXwFyvUVjew3BQj1czZcng4pekG5DGktrnX8OHD4+8tgp38FTMh6WseNWqU7AISPETqhk022STz3qFu4NlBzTN68jrvueeeep+nphvAm8QboH5EDi4y1NLA3FFcV4hpovg3mnbaabkXdJ2ycooppvAvlsNDocPphkwtwOqrrz7xxP9/5I8++ogDGRhMyngVw1eOrf744w9ZwICFK9dee+2YL0jbNEDjwN0xKpSxOuKsHsQJOnXqJFWHoaKziC0CGAVmmGEGXsl77733999/h8haQob6+tpQJKgrERIg5V1YpGBuYD4QVFkKq4IUhRevRX98ILqik1umkXlf5emGU045hbtD4iIrYe8RVDGJrAT5xJWw5UjQDRr4FZtuFRmyiynS3g0aaTvucjlWvroh346byKcbXN3g8BzL4TlWqFEm8Pvvv0sK9cADD4Q2vj+06QtojgCPqJ9//jlUCla5JcolZALH9GtA/eQhhxwS2qbrZQE1DtzdrA7AlIucCMz4McccE9pI/CmnnBILqPzk7gRyvnXWWSe0UdLpcow4y0FeBWKFy7IAUWt8otB+4kv8IBZaaCEWrB555JESQyeaaCJuedxxx8WHwgRDZuI1YMAATFfUyodAN/Dg8NmC0rDqOOecc84NN9wQanem0FMUY6FglbNXpj+WCT2lUwL5CtJC2UwJf6xC0E0+XzYTSrU8yQd5LJ1jpSuqXTbjGK9CIf5ZJRROOumkMTVgfqWrOAiQvBIK33jjjcTg+Yknnvj111+xALcF6N1kJXRzopjA95yOwvjkSCgE3cArefrpp6UFhhksQDdwS1YcYBgbd0rCv/LSSy9ddUcYBfPeSTeYwICfCnfEcTkpQiE3QACVuV49v46vl5SH4L5wd1XHBPe90korybJYUdQLXjx4Frmkjh07ciWOLyv/+uuvRx55JCf4tpxuKAyFzVI3iD9WFd2QryA1YaYOupgiTTeYML0b8mF6N2gFaQlouuHss89OKEi1usFDocPpBofnWDHdoJtdmRMLsFeQuRrNEcCMgDkWV8LICjMnob20krEcigZS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">
   <a class="fee-btn primary" href="supertoss://send?bank=%ED%86%A0%EC%8A%A4%EB%B1%85%ED%81%AC&accountNo=100007262511">토스로 바로 보내기 <small>모바일</small></a>
   <button class="fee-btn" id="copyAcct">토스뱅크 1000-0726-2511 <small>복사</small></button>
-  <p style="margin-top:2px">예금주 김지윤 · 이용료는 서버비와 새 공간 만드는 데 써요.</p>
+  <p style="margin-top:2px">예금주 김지윤 · 서버비와 새 공간에 써요.</p>
   <div class="maker"><span>만든 사람</span><a href="https://www.instagram.com/qooqoo.haseyo/" target="_blank" rel="noopener">김지윤 (Qoo) · @qooqoo.haseyo</a></div>
 </div>
 <div id="toast" class="pill"></div>
@@ -444,6 +444,9 @@ ffGeo.setAttribute('position', new THREE.BufferAttribute(ffPos,3));
 const fireflies = new THREE.Points(ffGeo, new THREE.PointsMaterial({color:'#ffe9a8', size:.09, transparent:true, opacity:.85, blending:THREE.AdditiveBlending, depthWrite:false}));
 scene.add(fireflies);
 
+function shalaMatAt(x,z){ return mats.find(m => Math.abs(m.x - x) < .7 && Math.abs(m.z - z) < 1.2); }
+// 수련할 때 바라볼 방향: 샬라 매트면 제단, 바닷가면 바다, 아니면 지금 방향
+function practiceFace(y){ if (shalaMatAt(y.pos.x, y.pos.z)) return Math.PI; const r = Math.hypot(y.pos.x, y.pos.z); if (r > 15) return Math.atan2(y.pos.x, y.pos.z); if (groundY(y.pos.x,y.pos.z) === DECK.h) return Math.PI*.85; return y.heading; }
 function groundY(x,z){
   if (x>SHALA.x0 && x<SHALA.x1 && z>SHALA.z0 && z<SHALA.z1) return SHALA.h + .03;
   if (x>DECK.x0 && x<DECK.x1 && z>DECK.z0 && z<DECK.z1) return DECK.h;
@@ -456,8 +459,8 @@ const HAIR = ['#2e2420','#4a3426','#6b4a33','#1f1c1f','#8a5a3c'];
 const OUTFIT = ['#e8b7a3','#a9c0a0','#c7b8dc','#f0d6a8','#9fb7c4','#d9a3a8','#efe6da'];
 const PANTS = ['#4b4a5e','#6b5a70','#5b6b5e','#7a6355','#3f4a5a'];
 
-function randomLook(){ return {skin:pick(SKIN), hair:pick(HAIR), top:pick(OUTFIT), pants:pick(PANTS)}; }
-function sanitizeLook(l){ const r = randomLook(); const ok = v => typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v); return l ? {skin:ok(l.skin)?l.skin:r.skin, hair:ok(l.hair)?l.hair:r.hair, top:ok(l.top)?l.top:r.top, pants:ok(l.pants)?l.pants:r.pants} : r; }
+function randomLook(){ return {skin:pick(SKIN), hair:pick(HAIR), top:pick(OUTFIT), pants:pick(PANTS), mat:pick(MAT_COLORS)}; }
+function sanitizeLook(l){ const r = randomLook(); const ok = v => typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v); return l ? {skin:ok(l.skin)?l.skin:r.skin, hair:ok(l.hair)?l.hair:r.hair, top:ok(l.top)?l.top:r.top, pants:ok(l.pants)?l.pants:r.pants, mat:ok(l.mat)?l.mat:r.mat} : r; }
 function makeYogi(look){
   const skin = mat(look.skin), hair = mat(look.hair), top = mat(look.top), pants = mat(look.pants);
   const g = new THREE.Group(), root = new THREE.Group(); g.add(root);
@@ -480,8 +483,12 @@ function makeYogi(look){
   const armGeo = new THREE.CylinderGeometry(.058,.05,.36,10);
   const armL = new THREE.Group(); armL.position.set(-.22,.4,0); torso.add(armL); add(armL,armGeo,top,0,-.18,0); add(armL,new THREE.SphereGeometry(.062,10,8),skin,0,-.38,0);
   const armR = new THREE.Group(); armR.position.set(.22,.4,0);  torso.add(armR); add(armR,armGeo,top,0,-.18,0); add(armR,new THREE.SphereGeometry(.062,10,8),skin,0,-.38,0);
+  // rolled-up mat carried on the back
+  const matMat = mat(look.mat || pick(MAT_COLORS), {roughness:1});
+  const roll = new THREE.Mesh(new THREE.CylinderGeometry(.085,.085,.62,14), matMat); roll.rotation.z = Math.PI/2; roll.position.set(0,.34,-.25); roll.castShadow = true; torso.add(roll); parts.push(roll);
+  const laid = new THREE.Mesh(new THREE.BoxGeometry(.95,.03,1.95), matMat); laid.receiveShadow = true; laid.visible = false; scene.add(laid);
   scene.add(g);
-  return {g, root, hips, torso, chest, head, armL, armR, legL, legR, parts};
+  return {g, root, hips, torso, chest, head, armL, armR, legL, legR, parts, roll, laid};
 }
 
 const POSES = {
@@ -507,7 +514,7 @@ class Yogi {
     const lbl = document.createElement('div'); lbl.className = 'lbl' + (isMe ? ' me' : ''); lbl.textContent = isMe ? '나 · ' + name : name; $('labels').appendChild(lbl); this.lbl = lbl; this.lblUntil = 0;
     const bub = document.createElement('div'); bub.className = 'bub'; bub.textContent = '🙏'; $('labels').appendChild(bub); this.bub = bub; this.bubUntil = 0;
   }
-  remove(){ scene.remove(this.m.g); this.lbl.remove(); this.bub.remove(); }
+  remove(){ scene.remove(this.m.g); scene.remove(this.m.laid); this.lbl.remove(); this.bub.remove(); }
   walkTo(x,z){ this.target = new THREE.Vector3(x,0,z); this.pose = 'stand'; this.faceTo = null; }
   setPose(p, face){ this.target = null; this.pose = p; if (face !== undefined) this.faceTo = face; }
   namaste(){ this.tempPose = 'namaste'; this.tempUntil = now + 1.7; this.bubUntil = now + 1.8; }
@@ -527,6 +534,15 @@ class Yogi {
     this.m.g.position.copy(this.pos); this.m.g.rotation.y = this.heading;
 
     const active = (this.tempPose && now < this.tempUntil) ? this.tempPose : (walking ? 'stand' : this.pose);
+    // 아무 데서나 수련하면 등에 멘 매트를 펼쳐요 (샬라 매트 위에서는 그대로)
+    const posing = !walking && (this.pose !== 'stand' || this.breathe);
+    const lay = posing && !shalaMatAt(this.pos.x, this.pos.z);
+    if (lay && !this.laid) { this.laid = true; this.matAt = {x:this.pos.x, z:this.pos.z}; this.matS = this.matS || 0; }
+    if (!lay) this.laid = false;
+    this.matS = (this.matS || 0) + ((this.laid ? 1 : 0) - (this.matS || 0)) * Math.min(1, dt*5);
+    const L = this.m.laid;
+    L.visible = this.matS > .03; this.m.roll.visible = this.matS < .5;
+    if (L.visible && this.matAt) { const h = this.heading; L.rotation.y = h; L.scale.z = Math.max(.02, this.matS); L.position.set(this.matAt.x - Math.sin(h)*.3, groundY(this.matAt.x, this.matAt.z) + .016, this.matAt.z - Math.cos(h)*.3); }
     const P = POSES[active] || POSES.stand, c = this.cur, k = Math.min(1, dt*(active === 'savasana' || active === 'downdog' || active==='child' ? 3 : 6));
     if (c.ls === undefined) c.ls = 1;
     for (const key of ['ry','rx','tx']) c[key] += (P[key]-c[key])*k;
@@ -575,7 +591,7 @@ try { localStorage.setItem('soom-me', JSON.stringify({name:myName, look:myLook, 
 me.pos.set(rand(-1.8,1.8),0,rand(10.5,13)); me.heading = Math.PI;
 
 const npcs = [];
-const GARDEN_SPOTS = [[-5,3],[5,4],[-8,-1],[8,8],[-3,10],[4,14],[-10,6],[12.4,-3.5],[11.2,-4.6],[13.6,-4.6],[-12,-6],[9,2]];
+const GARDEN_SPOTS = [[-5,3],[5,4],[-8,-1],[8,8],[-3,10],[4,14],[-10,6],[12.4,-3.5],[11.2,-4.6],[13.6,-4.6],[-12,-6],[9,2],[0,22.5],[-12,19.5],[14,17.5],[-21,6],[20,-9],[-17,-15]];
 function freeMat(){ const free = mats.filter(m => !m.taken); return free.length ? pick(free) : null; }
 function npcDecide(n){
   if (n.mat) { n.mat.taken = null; n.mat = null; }
@@ -585,7 +601,7 @@ function npcDecide(n){
   }
   const [x,z] = pick(GARDEN_SPOTS);
   n.walkTo(x + rand(-.8,.8), z + rand(-.8,.8));
-  n.onArrive = () => { const onDeck = groundY(n.pos.x,n.pos.z) === DECK.h; n.faceTo = onDeck ? Math.PI*.85 : rand(-Math.PI,Math.PI); n.pose = onDeck ? pick(['sit','sit','savasana']) : pick(['stand','sit','stand']); n.until = now + rand(8,18); };
+  n.onArrive = () => { const onDeck = groundY(n.pos.x,n.pos.z) === DECK.h, beach = Math.hypot(n.pos.x,n.pos.z) > 15; n.pose = (onDeck || beach) ? pick(['sit','sit','tree','savasana','downdog']) : pick(['stand','sit','stand']); n.faceTo = (onDeck || beach) ? practiceFace(n) : rand(-Math.PI,Math.PI); n.until = now + rand(10,22); };
 }
 for (let i=0;i<(ONLINE?0:8);i++){
   const n = new Yogi(uniqueName(), false);
@@ -639,13 +655,21 @@ function makeTransport(h){
   return { send: (ev,p) => { if (ch && ready) ch.send({type:'broadcast', event:ev, payload:p}).catch(() => {}); } };
 }
 function myState(){
-  return {id:myId, name:myName, look:myLook, x:+me.pos.x.toFixed(2), z:+me.pos.z.toFixed(2), h:+me.heading.toFixed(2), pose:me.pose, b:me.breathe ? 1 : 0};
+  const st = {id:myId, name:myName, look:myLook, x:+me.pos.x.toFixed(2), z:+me.pos.z.toFixed(2), h:+me.heading.toFixed(2), pose:me.pose, b:me.breathe ? 1 : 0};
+  if (me.target) { st.tx = +me.target.x.toFixed(2); st.tz = +me.target.z.toFixed(2); }
+  return st;
 }
-let lastSent = -9, lastSig = '';
+// 메시지 아끼기: 톡 눌러 걸을 땐 목적지만 한 번, 키보드로 걸을 땐 0.5초마다, 가만히 있으면 20초에 한 번만 보내요
+let lastSent = -99, lastSig = '';
 function sendState(force){
   if (!net || netStatus !== 'online') return;
-  const st = myState(); const sig = [st.x, st.z, st.h, st.pose, st.b].join(',');
-  if (!force) { if (now - lastSent < .2) return; if (sig === lastSig && now - lastSent < 3) return; }
+  const st = myState(), moving = !!me._kbWalk;
+  const sig = [st.pose, st.b, st.tx, st.tz, moving ? 1 : 0, moving ? '' : st.x + ',' + st.z].join('|');
+  if (!force) {
+    if (moving) { if (now - lastSent < .5) return; }
+    else if (sig === lastSig) { if (now - lastSent < 20) return; }
+    else if (now - lastSent < .15) return;
+  }
   lastSig = sig; lastSent = now; net.send('state', st);
 }
 function dropRemote(id){ const r = remotes.get(id); if (r) { r.remove(); remotes.delete(id); renderVisitors(); } }
@@ -659,7 +683,9 @@ const net = ONLINE ? makeTransport({
       r.pos.set(p.x, groundY(p.x,p.z), p.z); r.heading = +p.h || 0; remotes.set(p.id, r);
       renderVisitors(); sendState(true);
     }
-    r.lastSeen = now; r.net = {x:p.x, z:p.z, h:+p.h || 0};
+    r.lastSeen = now;
+    if (Math.hypot(p.x - r.pos.x, p.z - r.pos.z) > 6) { r.pos.x = p.x; r.pos.z = p.z; r.target = null; }
+    r.net = (isFinite(p.tx) && isFinite(p.tz)) ? {x:p.tx, z:p.tz, h:+p.h || 0, walk:true} : {x:p.x, z:p.z, h:+p.h || 0};
     r.pose = POSES[p.pose] ? p.pose : 'stand'; r.breathe = !!p.b;
   },
   greet: p => { const r = p && remotes.get(p.id); if (r) { r.namaste(); bowlSound(.35, BOWLS[p.bowl] ? p.bowl : 'clear'); } },
@@ -669,11 +695,11 @@ const net = ONLINE ? makeTransport({
 updateRoomLabel();
 function updateRemotes(dt){
   for (const r of [...remotes.values()]) {
-    if (now - r.lastSeen > 12) { dropRemote(r.id); continue; }
+    if (now - r.lastSeen > 60) { dropRemote(r.id); continue; }
     if (r.net) {
       const d = Math.hypot(r.net.x - r.pos.x, r.net.z - r.pos.z);
-      if (d > 6) { r.pos.x = r.net.x; r.pos.z = r.net.z; r.target = null; }
-      else if (d > .06) { r.target = new THREE.Vector3(r.net.x, 0, r.net.z); r.speed = Math.max(2.4, d*3); }
+      if (!r.net.walk && d > 6) { r.pos.x = r.net.x; r.pos.z = r.net.z; r.target = null; }
+      else if (d > .06) { r.target = new THREE.Vector3(r.net.x, 0, r.net.z); r.speed = r.net.walk ? 2.6 : Math.max(2.4, d*3); }
       r.faceTo = r.net.h;
     }
     r.update(dt);
@@ -756,7 +782,7 @@ function setActive(){
   $('breathBtn').classList.toggle('on', me.breathe);
 }
 function stopBreath(){ me.breathe = false; $('breath').classList.remove('show'); }
-function onMat(){ return mats.find(m => Math.abs(m.x - me.pos.x) < .7 && Math.abs(m.z - me.pos.z) < 1.2); }
+function onMat(){ return shalaMatAt(me.pos.x, me.pos.z); }
 
 $('namasteBtn').onclick = () => {
   me.namaste(); bowlSound(.8); if (net) net.send('greet', {id:myId, bowl:myBowl});
@@ -769,7 +795,7 @@ asanaMenu.querySelectorAll('button').forEach(b => b.onclick = e => {
   if (p === 'class') { $('classBtn').click(); return; }
   stopBreath();
   if (p === 'stop') me.setPose('stand');
-  else { const m = onMat(); me.setPose(p, m ? Math.PI : me.heading); }
+  else me.setPose(p, practiceFace(me));
   setActive();
 });
 let breathTimer = null;
@@ -789,7 +815,7 @@ function breathLoop(){
 $('breathBtn').onclick = () => {
   asanaMenu.classList.remove('open');
   if (me.breathe) { stopBreath(); me.setPose('stand'); }
-  else { const m = onMat(); me.setPose('sit', m ? Math.PI : me.heading); me.breathe = true; $('breath').classList.add('show'); clearTimeout(breathTimer); breathLoop(); }
+  else { me.setPose('sit', practiceFace(me)); me.breathe = true; $('breath').classList.add('show'); clearTimeout(breathTimer); breathLoop(); }
   setActive();
 };
 document.addEventListener('click', () => asanaMenu.classList.remove('open'));
@@ -803,9 +829,9 @@ $('feeBtn').onclick = () => { $('fee').classList.toggle('open'); $('visitors').c
 $('closeFee').onclick = () => $('fee').classList.remove('open');
 $('copyAcct').onclick = async () => {
   const acct = '토스뱅크 100007262511';
-  try { await navigator.clipboard.writeText(acct); toast('계좌번호를 복사했어요 🙏'); }
+  try { await navigator.clipboard.writeText(acct); toast('계좌번호 복사 완료 🙏'); }
   catch(e) {
-    try { const ta = document.createElement('textarea'); ta.value = acct; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('계좌번호를 복사했어요 🙏'); }
+    try { const ta = document.createElement('textarea'); ta.value = acct; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('계좌번호 복사 완료 🙏'); }
     catch(e2) { toast('토스뱅크 1000-0726-2511'); }
   }
 };
@@ -828,12 +854,12 @@ function runClass(){
     const [pose, label, sec] = CLASS_SEQ[i++];
     $('capText').textContent = label; $('caption').classList.add('show');
     bowlSound(.9);
-    [me, ...npcs].forEach((p,k) => setTimeout(() => p.setPose(pose, groundY(p.pos.x,p.pos.z) > .25 ? Math.PI : p.heading), p.isMe ? 0 : rand(100,700)));
+    [me, ...npcs].forEach((p,k) => setTimeout(() => p.setPose(pose, practiceFace(p)), p.isMe ? 0 : rand(100,700)));
     setTimeout(step, sec*1000);
   };
   step();
 }
-$('classBtn').onclick = () => { if (!classOn) toast('정각에 다 같이 하는 수련을 혼자 미리 해봐요'); runClass(); };
+$('classBtn').onclick = () => { if (!classOn) toast('정각 수련을 미리 해봐요'); runClass(); };
 // 함께 수련: 한국 시간 정각에 모든 접속자 화면에서 같은 순서로 시작돼요
 const SLOTS = [[7,'아침 태양 경배'],[19,'노을 스트레칭'],[22,'요가 니드라']];
 function kst(){ const d = new Date(Date.now() + 9*3600e3); return {h:d.getUTCHours(), m:d.getUTCMinutes(), s:d.getUTCSeconds()}; }
